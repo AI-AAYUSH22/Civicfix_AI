@@ -39,9 +39,9 @@ export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
   const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
 
   // Contractor State
-  const [selectedWardId, setSelectedWardId] = useState<string>('G/N');
-  const [contractorId, setContractorId] = useState<string>('contractor_g_n');
-  const [contractorPassword, setContractorPassword] = useState<string>('password123');
+  const [contractorId, setContractorId] = useState<string>('C001');
+  const [selectedWardId, setSelectedWardId] = useState<string>('R Central');
+  const [contractorPassword, setContractorPassword] = useState<string>('Contractor@123');
 
   // Municipal Engineer State
   const [employeeId, setEmployeeId] = useState('BMC-ENG-4001');
@@ -52,15 +52,12 @@ export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Handle Ward Selection for Contractor
-  const handleWardChange = (wardId: string) => {
-    setSelectedWardId(wardId);
-    const found = mockContractors.find((c) => c.wardId === wardId);
+  // Handle Contractor Selection
+  const handleContractorSelect = (cId: string) => {
+    setContractorId(cId);
+    const found = mockContractors.find((c) => c.contractorId.toUpperCase() === cId.toUpperCase() || c.id.toUpperCase() === cId.toUpperCase());
     if (found) {
-      setContractorId(found.contractorId);
-    } else {
-      const slug = wardId.toLowerCase().replace(/[^a-z0-9]/g, '_');
-      setContractorId(`contractor_${slug}`);
+      setSelectedWardId(found.wardId);
     }
   };
 
@@ -409,35 +406,35 @@ export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
             </div>
           )}
 
-          {/* TAB 2: CONTRACTOR DASHBOARD (48 Wards Data) */}
+          {/* TAB 2: CONTRACTOR DASHBOARD (250 BMC Contractors) */}
           {activeTab === 'contractor' && (
             <div className="space-y-5">
               <div className="border-b border-slate-700/60 pb-3">
                 <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
                   <HardHat size={20} className="text-amber-400" />
-                  <span>Contractor Login (48 Wards)</span>
+                  <span>Contractor Login (250 Empanelled Contractors)</span>
                 </h2>
                 <p className="text-xs text-slate-400 mt-1">
-                  Select any of the 48 Ward Contractors to open that specific ward's repair dashboard.
+                  Select any of the 250 Empanelled BMC Road Contractors to open their specific repair dispatch dashboard.
                 </p>
               </div>
 
               <form onSubmit={handleContractorSubmit} className="space-y-4">
-                {/* 48 Ward Dropdown Picker */}
+                {/* 250 Contractors Dropdown Picker */}
                 <div>
                   <label className="block text-xs font-semibold text-amber-300 mb-1.5 flex items-center justify-between">
-                    <span>Select Ward Contractor (1 to 48 Wards)</span>
-                    <span className="text-[10px] text-slate-400 font-mono">48 Ward Accounts</span>
+                    <span>Select Empanelled Contractor (C001 to C250)</span>
+                    <span className="text-[10px] text-slate-400 font-mono">250 Official Contractors</span>
                   </label>
                   <div className="relative">
                     <select
-                      value={selectedWardId}
-                      onChange={(e) => handleWardChange(e.target.value)}
+                      value={contractorId}
+                      onChange={(e) => handleContractorSelect(e.target.value)}
                       className="w-full bg-[#0D1525] border border-amber-600/40 rounded-xl px-3.5 py-2.5 text-xs text-amber-100 font-medium focus:outline-none focus:border-amber-500"
                     >
                       {mockContractors.map((c) => (
-                        <option key={c.id} value={c.wardId}>
-                          Ward {c.wardId} — {c.name} ({c.city})
+                        <option key={c.id} value={c.contractorId}>
+                          {c.contractorId} — {c.name} (Ward {c.wardId}, {c.zone || 'Mumbai'})
                         </option>
                       ))}
                     </select>
@@ -446,13 +443,13 @@ export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Contractor ID / Username
+                    Contractor ID / Email
                   </label>
                   <input
                     type="text"
                     value={contractorId}
-                    onChange={(e) => setContractorId(e.target.value)}
-                    placeholder="e.g. contractor_g_n"
+                    onChange={(e) => handleContractorSelect(e.target.value)}
+                    placeholder="e.g. C001 or c001@civicfix.org"
                     className="w-full bg-[#0D1525] border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500"
                     required
                   />
@@ -466,7 +463,7 @@ export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
                     type="password"
                     value={contractorPassword}
                     onChange={(e) => setContractorPassword(e.target.value)}
-                    placeholder="password123"
+                    placeholder="Contractor@123"
                     className="w-full bg-[#0D1525] border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500"
                     required
                   />
@@ -477,8 +474,8 @@ export const UnifiedLogin: React.FC<UnifiedLoginProps> = ({
                     <Sparkles size={12} />
                     <span>Selected Contractor:</span>
                   </div>
-                  <div>ID: <span className="font-mono text-white">{contractorId}</span></div>
-                  <div>Ward: <span className="font-medium text-white">{mockContractors.find(c => c.wardId === selectedWardId)?.wardName || selectedWardId}</span></div>
+                  <div>ID: <span className="font-mono text-white">{contractorId}</span> — {mockContractors.find(c => c.contractorId.toUpperCase() === contractorId.toUpperCase())?.name || 'Empanelled Contractor'}</div>
+                  <div>Ward: <span className="font-medium text-white">{mockContractors.find(c => c.contractorId.toUpperCase() === contractorId.toUpperCase())?.wardName || selectedWardId}</span></div>
                 </div>
 
                 <button

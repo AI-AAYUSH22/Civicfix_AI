@@ -14,6 +14,8 @@ export interface ApiCase {
   source_username?: string;
   source_url?: string;
   citizen_name?: string;
+  citizen_phone?: string;
+  reported_by?: string;
   location_status?: string;
   location_confidence?: number;
   ward_id?: string;
@@ -230,14 +232,21 @@ export async function getContractors(): Promise<any[]> {
   return res.json();
 }
 
-export async function getCases(params?: { status?: string; ward_id?: string; city?: string }): Promise<ApiCase[]> {
+export async function getCases(params?: { status?: string; ward_id?: string; city?: string; citizen_phone?: string }): Promise<ApiCase[]> {
   const query = new URLSearchParams();
   if (params?.status) query.append('status', params.status);
   if (params?.ward_id) query.append('ward_id', params.ward_id);
   if (params?.city) query.append('city', params.city);
+  if (params?.citizen_phone) query.append('citizen_phone', params.citizen_phone);
 
   const res = await fetch(`${API_BASE_URL}/cases?${query.toString()}`);
   if (!res.ok) throw new Error(`Failed to load cases: ${res.statusText}`);
+  return res.json();
+}
+
+export async function getCasesByPhone(phoneNumber: string): Promise<ApiCase[]> {
+  const res = await fetch(`${API_BASE_URL}/cases/by-phone/${encodeURIComponent(phoneNumber)}`);
+  if (!res.ok) throw new Error(`Failed to load cases for phone ${phoneNumber}: ${res.statusText}`);
   return res.json();
 }
 

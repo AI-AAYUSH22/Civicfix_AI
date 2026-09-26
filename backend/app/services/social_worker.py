@@ -126,20 +126,29 @@ class SocialWorker:
                         if res_data.get("ok"):
                             updates = res_data.get("result", [])
                             if updates:
+                                logger.info(f"Telegram poller received {len(updates)} update(s).")
                                 db = SessionLocal()
                                 try:
                                     for update in updates:
-                                        last_update_id = max(last_update_id, update.get("update_id", 0))
-                                        await process_telegram_update(update, db)
+                                        up_id = update.get("update_id", 0)
+                                        last_update_id = max(last_update_id, up_id)
+                                        try:
+                                            await process_telegram_update(update, db)
+                                        except Exception as err:
+                                            logger.error(f"Error processing Telegram update {up_id}: {err}", exc_info=True)
                                 finally:
                                     db.close()
+                    elif res.status_code == 409:
+                        # Another instance polled getUpdates; wait a bit
+                        logger.warning("Telegram getUpdates returned 409 Conflict (multiple pollers active). Waiting 3s...")
+                        await asyncio.sleep(3.0)
 
-                await asyncio.sleep(1.0)
+                await asyncio.sleep(0.5)
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                logger.error(f"Error in Telegram polling loop: {e}")
-                await asyncio.sleep(5.0)
+                logger.error(f"Error in Telegram polling loop: {e}", exc_info=True)
+                await asyncio.sleep(3.0)
 
 
 # Global singleton instance

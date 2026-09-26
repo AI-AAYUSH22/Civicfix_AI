@@ -40,6 +40,7 @@ def run_migrations():
                     ("channel", "VARCHAR(50) DEFAULT 'PORTAL'"),
                     ("source_id", "VARCHAR(255)"),
                     ("citizen_name", "VARCHAR(255)"),
+                    ("citizen_phone", "VARCHAR(50)"),
                     ("source_username", "VARCHAR(255)"),
                     ("source_url", "VARCHAR(500)"),
                     ("location_status", "VARCHAR(50) DEFAULT 'RESOLVED'"),

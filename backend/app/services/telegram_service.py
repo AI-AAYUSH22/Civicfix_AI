@@ -11,10 +11,12 @@ TELEGRAM_API_BASE = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}"
 TELEGRAM_FILE_BASE = f"https://api.telegram.org/file/bot{settings.TELEGRAM_BOT_TOKEN}"
 
 
+from app.services.storage_service import save_raw_bytes
+
 async def download_telegram_file(file_id: str) -> Tuple[str, str, str]:
     """
     Retrieves file metadata from Telegram Bot API and downloads the image to local storage.
-    Returns: (filename, relative_storage_path, mime_type)
+    Returns: (relative_storage_path, original_filename, sha256_hash)
     """
     async with httpx.AsyncClient(timeout=30.0) as client:
         # Step 1: Get file path from Telegram
@@ -34,21 +36,11 @@ async def download_telegram_file(file_id: str) -> Tuple[str, str, str]:
         file_res = await client.get(download_url)
         file_res.raise_for_status()
 
-        # Step 3: Save to local UPLOAD_DIR / complaints
-        complaints_dir = os.path.join(settings.UPLOAD_DIR, "complaints")
-        os.makedirs(complaints_dir, exist_ok=True)
-
         ext = os.path.splitext(file_path)[1] or ".jpg"
         filename = f"telegram_{uuid.uuid4().hex[:10]}{ext}"
-        full_path = os.path.join(complaints_dir, filename)
-
-        with open(full_path, "wb") as f:
-            f.write(file_res.content)
-
-        rel_path = f"/uploads/complaints/{filename}"
-        mime_type = "image/jpeg" if ext in [".jpg", ".jpeg"] else "image/png"
-        logger.info(f"Downloaded Telegram media {file_id} -> {full_path}")
-        return filename, rel_path, mime_type
+        rel_path, orig_name, file_hash = save_raw_bytes(content=file_res.content, orig_filename=filename, subfolder="complaints")
+        logger.info(f"Downloaded Telegram media {file_id} -> {rel_path} (hash: {file_hash[:8]})")
+        return rel_path, orig_name, file_hash
 
 
 async def send_telegram_message(
@@ -57,7 +49,7 @@ async def send_telegram_message(
     reply_to_message_id: Optional[int] = None
 ) -> Dict[str, Any]:
     """
-    Sends a message to a Telegram chat.
+    Sends a message to a Telegram chat with automatic fallback to plain text if Markdown parsing fails.
     """
     url = f"{TELEGRAM_API_BASE}/sendMessage"
     payload = {
@@ -74,9 +66,13 @@ async def send_telegram_message(
             res_data = res.json()
             if not res_data.get("ok"):
                 # Retry without Markdown if parse error
-                payload["parse_mode"] = None
+                payload.pop("parse_mode", None)
                 res = await client.post(url, json=payload)
                 res_data = res.json()
+            if res_data.get("ok"):
+                logger.info(f"Sent Telegram message to chat {chat_id}")
+            else:
+                logger.error(f"Telegram sendMessage failed for chat {chat_id}: {res_data}")
             return res_data
         except Exception as e:
             logger.error(f"Failed to send Telegram message to {chat_id}: {e}")

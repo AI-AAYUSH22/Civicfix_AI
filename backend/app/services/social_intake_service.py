@@ -6,6 +6,7 @@ from typing import Optional, Tuple, Dict, Any, List
 from sqlalchemy.orm import Session
 
 from app.models.case import Case, CaseLocation
+from app.models.user import User, UserRole
 from app.models.evidence import EvidenceFile
 from app.models.conversation_state import ConversationState
 from app.services.location_resolver import (
@@ -122,17 +123,43 @@ class SocialIntakeService:
         else:
             severity = "Medium"
 
-        # 6. Construct Case Title
+        # 6. Resolve citizen phone number and citizen profile if available
+        clean_phone = None
+        if channel == "WHATSAPP" or "wa-" in (source_id or ""):
+            phone_cand = (source_id or "").replace("wa-", "").replace("whatsapp:", "").strip()
+            clean_phone = "".join(c for c in phone_cand if c.isdigit() or c == "+")
+        elif raw_metadata and "phone" in raw_metadata:
+            phone_cand = str(raw_metadata["phone"]).strip()
+            clean_phone = "".join(c for c in phone_cand if c.isdigit() or c == "+")
+
+        user_id = None
+        if clean_phone:
+            user = db.query(User).filter(User.phone == clean_phone).first()
+            if not user:
+                user = User(
+                    full_name=username or f"WhatsApp Citizen ({clean_phone})",
+                    phone=clean_phone,
+                    email=f"{clean_phone.replace('+', '')}@whatsapp.civicfix.internal",
+                    role=UserRole.CITIZEN,
+                    is_active=True
+                )
+                db.add(user)
+                db.flush()
+            user_id = user.id
+
+        # 7. Construct Case Title
         title_loc = landmark if landmark else (address or "Road Surface Defect")
         title = f"[{channel}] Pothole near {title_loc}"
 
-        # 7. Create Case in database
+        # 8. Create Case in database
         case_id = f"CF-{uuid.uuid4().hex[:6].upper()}"
         new_case = Case(
             id=case_id,
             channel=channel,
             source_id=source_id,
-            citizen_name=f"{channel.capitalize()} Citizen ({username})",
+            citizen_name=username or (f"WhatsApp Citizen ({clean_phone})" if clean_phone else f"{channel.capitalize()} Citizen"),
+            citizen_phone=clean_phone,
+            reported_by=user_id,
             source_username=username,
             source_url=source_url,
             title=title,

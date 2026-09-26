@@ -96,6 +96,8 @@ export interface PotholeCase {
   afterImage?: string;
   verification?: RepairVerification;
   citizenName?: string;
+  citizenPhone?: string;
+  reportedBy?: string;
   channel?: 'APP' | 'WHATSAPP' | 'REDDIT' | 'PORTAL' | 'TELEGRAM';
   sourceUsername?: string;
   sourceUrl?: string;

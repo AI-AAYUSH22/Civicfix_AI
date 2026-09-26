@@ -86,6 +86,9 @@ export default function ReportScreen({ onFinished }: { onFinished?: () => void }
       formData.append('description', description);
       formData.append('severity', severity);
       formData.append('ward_id', wardId);
+      formData.append('citizen_phone', '9820012345');
+      formData.append('citizen_name', 'Aarav Sharma');
+      formData.append('reporter_email', '9820012345');
       if (addressDesc) formData.append('address', addressDesc);
       
       const filename = photoUri.split('/').pop() || 'photo.jpg';

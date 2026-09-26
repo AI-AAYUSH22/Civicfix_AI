@@ -1,0 +1,25 @@
+ward,zone,active_cases,verified_cases,contractors
+A,City,404,513,10
+B,City,386,469,13
+C,City,330,428,18
+D,City,421,247,6
+E,City,352,623,17
+F North,South Central,348,588,6
+F South,South Central,188,510,6
+G North,Central,295,391,15
+G South,Central,460,492,8
+H East,West,505,603,4
+H West,West,474,266,10
+K East,Andheri,331,404,9
+K West,Andheri,182,448,10
+L,Kurla,356,266,13
+M East,Chembur,131,596,16
+M West,Chembur,272,622,8
+N,Ghatkopar,316,341,13
+P North,Malad,439,586,6
+P South,Malad,266,621,7
+R North,Borivali,427,398,14
+R Central,Borivali,436,193,10
+R South,Borivali,218,497,10
+S,Powai,317,333,18
+T,Mulund,126,380,3

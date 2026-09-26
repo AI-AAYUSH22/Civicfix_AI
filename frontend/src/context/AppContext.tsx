@@ -93,6 +93,8 @@ function mapApiCaseToFrontend(c: ApiCase): PotholeCase {
     contractor: c.work_order?.contractor_name,
     channel: (c.channel as any) || 'PORTAL',
     citizenName: c.source_username || c.citizen_name || 'Citizen',
+    citizenPhone: c.citizen_phone,
+    reportedBy: c.reported_by,
     sourceUsername: c.source_username,
     sourceUrl: c.source_url,
     locationStatus: c.location_status,
@@ -180,18 +182,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const loginContractor = async (contractorId: string, _password: string, wardId?: string) => {
     const { mockContractors } = await import('@/data/mockData');
+    const cleanId = (contractorId || '').trim().toLowerCase();
     const found = mockContractors.find(
-      (c) => c.contractorId === contractorId || c.wardId === wardId || c.id === contractorId
+      (c) =>
+        c.contractorId.toLowerCase() === cleanId ||
+        c.id.toLowerCase() === cleanId ||
+        c.email.toLowerCase() === cleanId ||
+        (wardId && c.wardId.toLowerCase() === wardId.trim().toLowerCase())
     );
     const targetWard = found
-      ? mockWards.find((w) => w.id === found.wardId) || { id: found.wardId, name: found.wardName, city: found.city }
+      ? mockWards.find((w) => w.id.toLowerCase() === found.wardId.toLowerCase()) || { id: found.wardId, name: found.wardName, city: found.city }
       : mockWards[0];
 
     const user = {
       role: 'CONTRACTOR',
       contractor_id: found?.contractorId || contractorId,
       name: found?.name || `Contractor (${contractorId})`,
-      employee_id: contractorId,
+      employee_id: found?.contractorId || contractorId,
+      email: found?.email || `${contractorId.toLowerCase()}@civicfix.org`,
       assigned_ward: {
         ward_id: targetWard.id,
         ward_name: targetWard.name,

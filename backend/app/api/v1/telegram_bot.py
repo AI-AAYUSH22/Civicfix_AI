@@ -1,5 +1,6 @@
 import logging
 import asyncio
+import uuid
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Request, Response, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
@@ -80,7 +81,9 @@ async def process_telegram_update(update: Dict[str, Any], db: Session) -> None:
 
     from_user = message.get("from", {})
     username = from_user.get("username") or from_user.get("first_name") or "Telegram Citizen"
-    source_id = f"tg-{chat_id}"
+    msg_id = message.get("message_id") or uuid.uuid4().hex[:6]
+    source_id = f"tg-{chat_id}-{msg_id}"
+    user_identifier = f"tg-{chat_id}"
 
     text = message.get("text", "").strip()
     caption = message.get("caption", "").strip()
@@ -147,14 +150,14 @@ async def process_telegram_update(update: Dict[str, Any], db: Session) -> None:
                 full_text = f"Location Pin ({lat:.5f}, {lng:.5f})"
 
     # Check Active Conversation State to determine if this is a follow-up or new submission
-    conv_state = SocialIntakeService.get_or_create_conversation_state(db, "TELEGRAM", source_id)
-    is_followup = conv_state.current_step in ["WAITING_LOCATION", "WAITING_CLARIFICATION"] and conv_state.active_case_id
+    conv_state = SocialIntakeService.get_or_create_conversation_state(db, "TELEGRAM", user_identifier)
+    is_followup = conv_state.current_step in ["WAITING_LOCATION", "WAITING_CLARIFICATION"] and conv_state.active_case_id and not media_files
 
     if is_followup:
         res = SocialIntakeService.ingest_followup(
             db=db,
             channel="TELEGRAM",
-            source_id=source_id,
+            source_id=user_identifier,
             username=username,
             text=full_text,
             location_pin=location_pin,
@@ -170,7 +173,7 @@ async def process_telegram_update(update: Dict[str, Any], db: Session) -> None:
             media_files=media_files,
             location_pin=location_pin,
             source_url=f"https://t.me/{username}" if username != "Telegram Citizen" else None,
-            raw_metadata={"chat_id": chat_id, "message_id": message.get("message_id")}
+            raw_metadata={"chat_id": chat_id, "message_id": msg_id}
         )
 
     # Send Outbound Automated Response to Citizen
