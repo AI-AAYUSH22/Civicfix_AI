@@ -94,7 +94,7 @@ export const ContractorHome: React.FC<ContractorHomeProps> = ({
   wardFilter = 'all',
   onWardChange,
 }) => {
-  const { workOrders, cases, submitEvidenceHandler, submitExpenseMemoHandler } = useApp();
+  const { workOrders, cases, currentUser, submitEvidenceHandler, submitExpenseMemoHandler } = useApp();
 
   const [viewMode, setViewMode] = useState<'grouped' | 'list'>('grouped');
   const [selectedOrder, setSelectedOrder] = useState<WorkOrder | null>(null);
@@ -200,18 +200,21 @@ export const ContractorHome: React.FC<ContractorHomeProps> = ({
     return [...workOrders, ...citizenJobs];
   }, [workOrders, cases]);
 
-  // Filter orders by status/priority AND ward
+  // Strict Contractor Ward Isolation: Lock data strictly to logged-in contractor's assigned ward
+  const activeContractorWard = currentUser?.assigned_ward?.ward_id || (wardFilter !== 'all' ? wardFilter : null);
+
   const filteredOrders = combinedOrders.filter((order) => {
+    if (activeContractorWard && activeContractorWard !== 'all') {
+      const codeMatch = order.wardCode === activeContractorWard;
+      const idMatch = order.wardId === activeContractorWard;
+      const nameMatch = order.ward?.toLowerCase().includes(activeContractorWard.toLowerCase());
+      if (!codeMatch && !idMatch && !nameMatch) return false;
+    }
+
     if (filter === 'high' && order.priority !== 'High') return false;
     if (filter === 'progress' && order.status !== 'In Progress') return false;
     if (filter === 'review' && order.status !== 'Evidence Submitted' && order.status !== 'Needs Review') return false;
 
-    if (wardFilter && wardFilter !== 'all') {
-      const codeMatch = order.wardCode === wardFilter;
-      const idMatch = order.wardId === wardFilter;
-      const nameMatch = order.ward?.toLowerCase().includes(wardFilter.toLowerCase());
-      if (!codeMatch && !idMatch && !nameMatch) return false;
-    }
     return true;
   });
 

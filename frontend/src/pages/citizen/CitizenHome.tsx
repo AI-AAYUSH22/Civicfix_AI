@@ -29,7 +29,7 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
   autoOpenCamera = false,
   onReportClose,
 }) => {
-  const { cases, submitComplaint } = useApp();
+  const { cases, currentUser, submitComplaint } = useApp();
 
   const [reportModalOpen, setReportModalOpen] = useState(autoOpenCamera);
   const [reportStep, setReportStep] = useState<number>(autoOpenCamera ? 2 : 1);
@@ -292,9 +292,28 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
     }
   }, []);
 
-  // Active cases reported by citizens
-  const activeCases = cases.filter((c) => c.status !== 'CLOSED');
-  const resolvedCases = cases.filter((c) => c.status === 'VERIFIED' || c.status === 'CLOSED');
+  // Strict Citizen Data Isolation: Only show complaints reported by THIS citizen
+  const citizenCases = React.useMemo(() => {
+    if (!currentUser) return cases;
+
+    const userPhone = (currentUser.phone || '').replace(/[^0-9]/g, '');
+    const userName = (currentUser.name || '').toLowerCase().trim();
+
+    return cases.filter((c) => {
+      const cName = (c.citizenName || c.sourceUsername || '').toLowerCase().trim();
+      const cPhone = (c.citizenName || c.sourceUsername || '').replace(/[^0-9]/g, '');
+
+      if (userPhone && cPhone && (cPhone.includes(userPhone) || userPhone.includes(cPhone))) return true;
+      if (userName && cName && (cName.includes(userName) || userName.includes(cName))) return true;
+      if (c.citizenName && currentUser.phone && c.citizenName.includes(currentUser.phone)) return true;
+      if (c.citizenName && currentUser.name && c.citizenName.includes(currentUser.name)) return true;
+
+      return false;
+    });
+  }, [cases, currentUser]);
+
+  const activeCases = citizenCases.filter((c) => c.status !== 'CLOSED');
+  const resolvedCases = citizenCases.filter((c) => c.status === 'VERIFIED' || c.status === 'CLOSED');
 
   const handleOpenReport = (directToCamera = false) => {
     setReportStep(directToCamera ? 2 : 1);
@@ -393,6 +412,7 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
       formData.append('severity', severity);
       formData.append('address', address);
       formData.append('landmark', landmark);
+      formData.append('reporter_email', currentUser?.phone || currentUser?.name || 'Citizen Report');
       if (detectedWard?.ward_id) {
         formData.append('ward_id', detectedWard.ward_id);
       }
