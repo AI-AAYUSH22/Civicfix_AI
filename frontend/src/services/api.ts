@@ -9,7 +9,7 @@ export interface ApiCase {
   description: string;
   severity: 'Low' | 'Medium' | 'High';
   status: string;
-  channel?: 'PORTAL' | 'WHATSAPP' | 'REDDIT' | 'APP';
+  channel?: 'PORTAL' | 'WHATSAPP' | 'REDDIT' | 'APP' | 'TELEGRAM';
   source_id?: string;
   source_username?: string;
   source_url?: string;
@@ -456,7 +456,7 @@ export async function reviewVerification(
 
 export async function ingestSocialComplaint(
   rawText: string,
-  channel: 'REDDIT' | 'WHATSAPP',
+  channel: 'REDDIT' | 'WHATSAPP' | 'TELEGRAM',
   reporterHandle: string = 'citizen_feed',
   file?: File
 ): Promise<any> {

@@ -366,9 +366,28 @@ class SocialIntakeService:
         landmark: Optional[str]
     ) -> str:
         """
-        Generates standard reply prompts for WhatsApp or Reddit.
+        Generates standard reply prompts for Telegram, WhatsApp, or Reddit.
         """
-        if channel == "WHATSAPP":
+        if channel == "TELEGRAM":
+            if loc_status == "RESOLVED":
+                return (
+                    f"✅ *Thank you! Your complaint has been registered.* \n\n"
+                    f"📍 *Case ID:* `{case.id}`\n"
+                    f"🏛️ *Ward:* {case.ward.name if case.ward else 'Municipal Area'}\n"
+                    f"📌 *Location:* {landmark or 'GPS Pin'}\n\n"
+                    f"Our municipal contractor will inspect and repair the site."
+                )
+            elif loc_status == "NEEDS_CLARIFICATION":
+                return (
+                    f"📍 Case `{case.id}` recorded, but location is ambiguous near {landmark or 'this area'}.\n"
+                    f"Please tap 📎 and share your *Location Pin* or reply with a nearby street landmark."
+                )
+            else:
+                return (
+                    f"Thanks for reporting! We couldn't identify the exact location.\n"
+                    f"Please tap 📎 and share your *Location Pin* so we can dispatch the road contractor."
+                )
+        elif channel == "WHATSAPP":
             if loc_status == "RESOLVED":
                 return (
                     f"✅ Thank you! Your pothole complaint has been registered.\n\n"
@@ -410,7 +429,7 @@ class SocialIntakeService:
     ) -> Dict[str, Any]:
         """
         Idempotent notification dispatcher called once AI Verification passes.
-        Notifies original Reddit post or WhatsApp user with repair proof.
+        Notifies original Reddit post, WhatsApp, or Telegram user with repair proof.
         """
         case = db.query(Case).filter(Case.id == case_id).first()
         if not case:
@@ -422,7 +441,7 @@ class SocialIntakeService:
             return {"status": "SKIPPED", "detail": "Notification already dispatched."}
 
         channel = (case.channel or "PORTAL").upper()
-        if channel not in ["WHATSAPP", "REDDIT"]:
+        if channel not in ["WHATSAPP", "REDDIT", "TELEGRAM"]:
             # Standard citizen portal notification
             case.notification_sent = True
             case.last_notification_platform = "PORTAL"
@@ -440,7 +459,18 @@ class SocialIntakeService:
 
         delivery_status = "DELIVERED"
         # 1. Dispatch platform-specific message
-        if channel == "WHATSAPP":
+        if channel == "TELEGRAM":
+            if settings.TELEGRAM_BOT_TOKEN and case.source_id:
+                try:
+                    import asyncio
+                    from app.services.telegram_service import send_telegram_message
+                    chat_id = case.source_id.replace("tg-", "")
+                    asyncio.run(send_telegram_message(chat_id=chat_id, text=notification_text))
+                except Exception as e:
+                    logger.error(f"Failed to dispatch Telegram notification: {e}")
+                    delivery_status = "FAILED"
+        elif channel == "WHATSAPP":
+
             if settings.WHATSAPP_ACCESS_TOKEN and settings.WHATSAPP_PHONE_NUMBER_ID and case.source_id:
                 phone = case.source_id.replace("wa-", "").replace("+", "")
                 try:
