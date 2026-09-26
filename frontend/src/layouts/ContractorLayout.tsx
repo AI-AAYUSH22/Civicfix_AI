@@ -24,7 +24,7 @@ export const ContractorLayout: React.FC<ContractorLayoutProps> = ({
   onWardChange,
   onOpenQuickCapture,
 }) => {
-  const { wards, workOrders } = useApp();
+  const { wards, workOrders, currentUser } = useApp();
 
   const filters = [
     { id: 'all', label: 'All Jobs', count: assignedCount },
@@ -55,7 +55,7 @@ export const ContractorLayout: React.FC<ContractorLayoutProps> = ({
               <div>
                 <div className="flex items-center gap-1.5 text-xs text-teal-300 font-medium">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>RoadWorks Unit A • On-Duty</span>
+                  <span>{currentUser?.name || 'RoadWorks Unit A'} • {currentUser?.assigned_ward?.ward_name || 'Ward G/N'}</span>
                 </div>
                 <h1 className="text-base font-bold text-white tracking-tight">
                   CivicFix Contractor Field

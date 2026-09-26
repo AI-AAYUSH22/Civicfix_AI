@@ -231,3 +231,32 @@ export const mockWorkOrders = [
     coordinates: { lat: 19.1136, lng: 72.8697 },
   },
 ];
+
+export interface ContractorAccount {
+  id: string;
+  contractorId: string;
+  password: string;
+  name: string;
+  wardId: string;
+  wardName: string;
+  city: string;
+  phone: string;
+  email: string;
+}
+
+export const mockContractors: ContractorAccount[] = wards.slice(0, 48).map((ward, index) => {
+  const num = index + 1;
+  const wardSlug = ward.id.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  return {
+    id: `CON-WARD-${num < 10 ? '0' + num : num}`,
+    contractorId: `contractor_${wardSlug}`,
+    password: 'password123',
+    name: `${ward.name.split('-')[1]?.trim() || ward.name} Paving & Infra (Ward ${ward.id})`,
+    wardId: ward.id,
+    wardName: ward.name,
+    city: ward.city,
+    phone: `+91 98200 ${10000 + num}`,
+    email: `contractor.${wardSlug}@civicfix.org`,
+  };
+});
+

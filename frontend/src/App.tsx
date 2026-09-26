@@ -12,7 +12,7 @@ import { MunicipalLayout, MunicipalNavSection } from '@/layouts/MunicipalLayout'
 
 
 import { MunicipalDashboardView } from '@/pages/municipal/MunicipalDashboardView';
-import { MunicipalLogin } from '@/pages/municipal/MunicipalLogin';
+import { UnifiedLogin } from '@/pages/auth/UnifiedLogin';
 import { LandingPage } from '@/pages/landing/LandingPage';
 import { DesignSystemShowcase } from '@/pages/showcase/DesignSystemShowcase';
 import type { AppSurface } from '@/types';
@@ -21,8 +21,6 @@ import type { AppSurface } from '@/types';
 function AppContent() {
   const { backendConnected, currentUser, logout } = useApp();
   const [surface, setSurface] = useState<AppSurface>('landing');
-
-
 
   // Municipal state
   const [municipalSection, setMunicipalSection] = useState<MunicipalNavSection>('dashboard');
@@ -59,8 +57,12 @@ function AppContent() {
         )}
 
         {surface === 'login' && (
-          <MunicipalLogin
-            onSuccess={() => setSurface('municipal')}
+          <UnifiedLogin
+            onSuccess={(role) => {
+              if (role === 'citizen') setSurface('citizen');
+              else if (role === 'contractor') setSurface('contractor');
+              else setSurface('municipal');
+            }}
             onBackToLanding={() => setSurface('landing')}
           />
         )}
