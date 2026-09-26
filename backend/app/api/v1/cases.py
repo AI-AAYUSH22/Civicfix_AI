@@ -51,7 +51,7 @@ def serialize_case(case: Case) -> dict:
                 "file_name": ev.file_name,
                 "captured_at": ev.captured_at.isoformat() if ev.captured_at else None,
             }
-            for ev in case.evidence_files
+            for ev in sorted(case.evidence_files, key=lambda x: x.captured_at or datetime.min, reverse=True)
         ],
         "created_at": case.created_at,
         "updated_at": case.updated_at,

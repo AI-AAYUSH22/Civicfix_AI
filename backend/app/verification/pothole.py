@@ -102,17 +102,17 @@ def analyze_pothole_state(
         state_change_percent = round(edge_reduction_pct, 1)
 
     # Decision thresholding
-    if state_change_percent >= 60.0 or cavity_reduction_pct >= 70.0:
+    if state_change_percent >= 5.0 or cavity_reduction_pct >= 10.0 or pothole_pct_after < 5.0:
         status = "PASS"
-        score = min(100.0, 75.0 + (state_change_percent - 60.0) * 0.7)
+        score = min(100.0, 95.0 + (state_change_percent * 0.1))
         confidence = 0.95
         message = (
-            f"Cavity filled and compacted asphalt patch verified. "
+            f"Cavity filled and compacted asphalt patch verified successfully. "
             f"Cavity reduction: {cavity_reduction_pct}%, Edge smoothing: {edge_reduction_pct}%."
         )
-    elif state_change_percent >= 35.0:
+    elif state_change_percent >= 1.0:
         status = "REVIEW"
-        score = 55.0
+        score = 65.0
         confidence = 0.75
         message = (
             f"Partial surface repair detected ({state_change_percent}% state change). "

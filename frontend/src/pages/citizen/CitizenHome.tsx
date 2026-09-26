@@ -157,10 +157,6 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
         permStatus.onchange = () => {
           setLocationPermission(permStatus.state as 'prompt' | 'granted' | 'denied');
         };
-        if (permStatus.state === 'denied') {
-          setGpsError('Location access denied. Please enable it in your browser settings and retry.');
-          return;
-        }
       }
     } catch {
       // Permissions API not supported, continue with direct geolocation call
@@ -184,7 +180,7 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
         setFetchingGPS(false);
         if (error.code === error.PERMISSION_DENIED) {
           setLocationPermission('denied');
-          setGpsError('Location access denied. Please enable it in your browser settings and retry.');
+          setGpsError('Location access denied. Please click the lock icon in your browser URL bar (or site settings) to allow Location access, then click Detect GPS again.');
         } else if (error.code === error.POSITION_UNAVAILABLE) {
           setGpsError('Unable to determine your location. Please ensure GPS is enabled on your device.');
         } else if (error.code === error.TIMEOUT) {
@@ -236,7 +232,7 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
         setFetchingGPS(false);
         if (error.code === error.PERMISSION_DENIED) {
           setLocationPermission('denied');
-          setGpsError('Location access denied. Please enable it in your browser settings and retry.');
+          setGpsError('Location access denied. Please click the lock icon in your browser URL bar (or site settings) to allow Location access, then click Detect GPS again.');
         } else if (error.code === error.POSITION_UNAVAILABLE) {
           setGpsError('Unable to determine your location. Please ensure GPS is enabled.');
         } else if (error.code === error.TIMEOUT) {
@@ -262,6 +258,12 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
+
+  React.useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream, reportStep]);
 
   // Auto-trigger camera input when autoOpenCamera is activated
   React.useEffect(() => {
@@ -431,7 +433,9 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
 
   const startCamera = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).catch(
+        () => navigator.mediaDevices.getUserMedia({ video: true })
+      );
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -513,13 +517,10 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
   
   // Intercept changing step 2 to start camera
   const goToStep2 = () => {
-    if (locationPermission !== 'granted') {
-      setGpsError('Please grant location access before proceeding.');
-      requestLocationPermission();
-      return;
-    }
     setReportStep(2);
-    startCamera();
+    setTimeout(() => {
+      startCamera();
+    }, 100);
   };
 
   return (

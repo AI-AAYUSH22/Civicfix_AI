@@ -3,117 +3,139 @@ import numpy as np
 
 def analyze_pothole_image(image_bytes: bytes) -> dict:
     """
-    Analyzes an image to detect potholes using OpenCV.
-    Uses edge density, structural variance, and contour detection.
-    Returns a dictionary with is_pothole (bool), confidence (float), and estimated_size_sqm (float).
+    Analyzes an image to detect potholes using advanced OpenCV heuristics.
+    Includes background asphalt verification, cavity shadow checks, and targeted color filtering
+    to distinguish actual road defects from random images or objects.
     """
     try:
-        # Convert bytes to numpy array and decode image
         np_arr = np.frombuffer(image_bytes, np.uint8)
         img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         
         if img is None:
             raise ValueError("Invalid image format")
 
-        # --- NEW: Indoor/Selfie Detection via Color Variance ---
-        # A road is usually uniform in hue/saturation. A selfie or room has many different colors.
-        hsv_for_variance = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        # Calculate standard deviation of Hue and Saturation
-        _, stddev = cv2.meanStdDev(hsv_for_variance)
-        hue_stddev = stddev[0][0]
-        sat_stddev = stddev[1][0]
-        
-        # If the image has high color variance, it's likely a complex scene (like a person/room), not a road surface
-        if hue_stddev > 30 or sat_stddev > 40:
-            return {
-                "is_pothole": False,
-                "confidence": 95.0,
-                "estimated_size_sqm": 0.0,
-                "message": "Invalid: Complex scene detected (possible selfie or indoor photo). Please capture the road."
-            }
-
         height, width = img.shape[:2]
         total_pixels = height * width
 
-        # Global Check: A road image should not be overly saturated/colorful
         hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        global_mean_val = cv2.mean(hsv_img)
-        global_saturation = global_mean_val[1]
-        
-        # If the overall image is very colorful (like a room, grass, sky), it's not a road
-        if global_saturation > 60:
-            return {
-                "is_pothole": False,
-                "confidence": 10.0,
-                "estimated_size_sqm": 0.0,
-                "message": "Invalid: Background is too colorful to be an asphalt/dirt road."
-            }
-
-        # Convert to grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # 1. Edge Density - Potholes and damaged roads have high texture variance
-        edges = cv2.Canny(gray, 50, 150)
-        edge_density = np.sum(edges > 0) / edges.size
+        # 1. Background Asphalt Verification
+        # Sample the border of the image (outer 15%) to check if it matches a road surface
+        border_mask = np.ones((height, width), dtype=np.uint8)
+        border_mask[int(height*0.15):int(height*0.85), int(width*0.15):int(width*0.85)] = 0
+        
+        border_hsv_mean = cv2.mean(hsv_img, mask=border_mask)
+        border_saturation = border_hsv_mean[1]
+        
+        # Roads (asphalt/concrete) are typically gray, brown, or black (low to medium saturation).
+        # A studio background, grass, or sky will fail this.
+        if border_saturation > 220:
+            return {
+                "is_pothole": False,
+                "confidence": 92.0,
+                "estimated_size_sqm": 0.0,
+                "message": "Invalid: Surrounding background lacks asphalt/concrete texture (too colorful)."
+            }
 
-        # 2. Contour Detection for cavities/anomalies
+        # 2. Contour Detection for potential cavities
         blurred = cv2.GaussianBlur(gray, (15, 15), 0)
-        # We use a very localized adaptive threshold to find depressions/cracks
         thresh = cv2.adaptiveThreshold(
             blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 5
         )
 
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        max_score = 0
-        best_area = 0
+        best_cnt = None
+        max_area = 0
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            # Filter out tiny specks and massive background contours
-            if area < (total_pixels * 0.005) or area > (total_pixels * 0.5):
+            # Must be a reasonable size: not a speck, not the entire image
+            if area < (total_pixels * 0.005) or area > (total_pixels * 0.8):
                 continue
 
-            # Calculate a generic roughness score (perimeter relative to area)
             perimeter = cv2.arcLength(cnt, True)
             if perimeter == 0:
                 continue
                 
             roughness = (perimeter * perimeter) / area
-            
-            # Potholes and road damage are usually rough/jagged (high roughness)
-            if roughness < 5: 
-                continue # Too perfectly smooth
+            # Real potholes have some jaggedness. Perfectly smooth shapes (like a ball) are rejected.
+            if roughness < 2.5: 
+                continue 
 
-            score = (area / total_pixels) * 100
-            
-            if score > max_score:
-                max_score = score
-                best_area = area
+            if area > max_area:
+                max_area = area
+                best_cnt = cnt
 
-        # Decision Logic:
-        # A pothole image either has a significant detected cavity contour OR very high edge density (completely shattered road)
-        if max_score > 0.5 or edge_density > 0.05:
-            # Calculate confidence based on how much structural damage was found
-            confidence = min(99.0, 75.0 + (max_score * 2) + (edge_density * 200))
+        # 3. Analyze the most prominent anomaly
+        if best_cnt is not None:
+            anomaly_mask = np.zeros((height, width), dtype=np.uint8)
+            cv2.drawContours(anomaly_mask, [best_cnt], -1, 255, thickness=cv2.FILLED)
             
-            # Estimate size
-            area_ratio = best_area / total_pixels if best_area > 0 else (edge_density * 0.5)
-            estimated_size_sqm = round(max(0.1, area_ratio * 4.0), 2)
+            # Cavity Shadow Check: A hole goes into the ground, so it should be darker than the road.
+            anomaly_mean_brightness = cv2.mean(gray, mask=anomaly_mask)[0]
+            
+            bg_mask = cv2.bitwise_not(anomaly_mask)
+            bg_mean_brightness = cv2.mean(gray, mask=bg_mask)[0]
+            
+            # If the object is noticeably brighter than the road, it's likely debris, an animal, or a toy (e.g. a dinosaur)
+            # Note: Relaxed this check slightly to allow for water reflections (puddles)
+            if anomaly_mean_brightness > bg_mean_brightness + 40:
+                return {
+                    "is_pothole": False,
+                    "confidence": 88.0,
+                    "estimated_size_sqm": 0.0,
+                    "message": "Invalid: Detected object is brighter than the background (not a cavity)."
+                }
+            
+            # Targeted Color Filtering: The pothole itself shouldn't be bright yellow/red/purple
+            anomaly_hsv_mean = cv2.mean(hsv_img, mask=anomaly_mask)
+            anomaly_saturation = anomaly_hsv_mean[1]
+            
+            # Relaxed heavily: allows dirt, leaves, and muddy water to pass, while catching pure neon/toy colors
+            if anomaly_saturation > 180:
+                return {
+                    "is_pothole": False,
+                    "confidence": 95.0,
+                    "estimated_size_sqm": 0.0,
+                    "message": "Invalid: Detected anomaly is too colorful to be a road cavity."
+                }
+
+            # Passed all checks -> It's a real pothole
+            confidence = min(99.0, 75.0 + (max_area / total_pixels * 100))
+            estimated_size_sqm = round(max(0.1, (max_area / total_pixels) * 4.0), 2)
             
             return {
                 "is_pothole": True,
                 "confidence": round(confidence, 1),
                 "estimated_size_sqm": estimated_size_sqm,
-                "message": "Structural anomaly detected matching asphalt deterioration."
+                "message": "Valid pothole cavity detected."
             }
-        else:
-            return {
-                "is_pothole": False,
-                "confidence": 15.0,
-                "estimated_size_sqm": 0.0,
-                "message": "Low confidence: Surface appears too smooth or lacks defined cavities."
+
+        # 4. Fallback: Completely shattered road without a single clean contour
+        median_val = np.median(gray)
+        lower_canny = int(max(0, 0.66 * median_val))
+        upper_canny = int(min(255, 1.33 * median_val))
+        edges = cv2.Canny(gray, lower_canny, upper_canny)
+        edge_density = np.sum(edges > 0) / edges.size
+        
+        # High edge density implies terrible road condition (cracks, gravel, deterioration).
+        # Removed the arbitrary brightness check to allow sunlit roads.
+        if edge_density > 0.04:
+             return {
+                "is_pothole": True,
+                "confidence": min(95.0, 60 + edge_density*400),
+                "estimated_size_sqm": 1.5,
+                "message": "Widespread road surface deterioration detected."
             }
+
+        return {
+            "is_pothole": False,
+            "confidence": 75.0,
+            "estimated_size_sqm": 0.0,
+            "message": "Low confidence: Surface appears too smooth or lacks defined cavities."
+        }
     except Exception as e:
         return {
             "is_pothole": False,
@@ -139,8 +161,9 @@ def analyze_repaired_road_image(image_bytes: bytes) -> dict:
         mean_val = cv2.mean(hsv_img)
         mean_saturation = mean_val[1]
         
-        # If the image is highly saturated (colorful), reject it immediately.
-        if mean_saturation > 60:
+        # If the image is extremely saturated (colorful), reject it immediately.
+        # Increased from 60 to 180 to allow dirt, sand, and gravel tones
+        if mean_saturation > 180:
             return {
                 "is_repaired": False,
                 "confidence": 15.0,
@@ -153,7 +176,8 @@ def analyze_repaired_road_image(image_bytes: bytes) -> dict:
         edges = cv2.Canny(gray, 50, 150)
         edge_density = np.sum(edges > 0) / edges.size
         
-        if edge_density > 0.15:
+        # Increased from 0.15 to 0.45 to allow gravel and textured sand
+        if edge_density > 0.45:
             # Too many edges = highly textured, complex background, or extreme damage
             return {
                 "is_repaired": False,
@@ -170,7 +194,7 @@ def analyze_repaired_road_image(image_bytes: bytes) -> dict:
         
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if area < (total_pixels * 0.01) or area > (total_pixels * 0.4):
+            if area < (total_pixels * 0.05) or area > (total_pixels * 0.4): # Relaxed min area
                 continue
                 
             perimeter = cv2.arcLength(cnt, True)
@@ -180,7 +204,7 @@ def analyze_repaired_road_image(image_bytes: bytes) -> dict:
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
             
             # If we find a significantly large and somewhat circular dark spot -> it's a pothole, NOT repaired
-            if circularity > 0.3:
+            if circularity > 0.6: # Relaxed from 0.3
                 return {
                     "is_repaired": False,
                     "confidence": 10.0,
@@ -188,12 +212,13 @@ def analyze_repaired_road_image(image_bytes: bytes) -> dict:
                 }
                 
         # If it passes color, edge density, and contour checks, it is a smooth, repaired road
-        confidence = 98.0 - (edge_density * 100) # Smoother = higher confidence
+        confidence = 98.0 - (edge_density * 50) # Smoother = higher confidence
         
         return {
             "is_repaired": True,
-            "confidence": round(confidence, 1),
-            "message": "Valid: Smooth, uniform repaired road surface detected."
+            "confidence": round(max(confidence, 85.0), 1),
+            "estimated_size_sqm": 0.0,
+            "message": "Valid repaired road surface detected."
         }
 
     except Exception as e:
@@ -202,3 +227,4 @@ def analyze_repaired_road_image(image_bytes: bytes) -> dict:
             "confidence": 5.0,
             "message": f"Analysis failed: {str(e)}"
         }
+

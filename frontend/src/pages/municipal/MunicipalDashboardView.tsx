@@ -643,7 +643,7 @@ export const MunicipalDashboardView: React.FC<MunicipalDashboardViewProps> = ({
             verificationCases.map((vc) => {
               const woId = vc.id.replace('CF-', 'WO-');
               const vr = vc.verification;
-              const isVerified = vr?.status === 'Verified' || vc.status === 'VERIFIED';
+              const isVerified = vr?.status === 'Verified' || vc.status === 'VERIFIED' || vc.status === 'VERIFIED_CLOSED';
 
               return (
                 <Card key={vc.id} padded="md" className={`space-y-4 border-l-4 ${isVerified ? 'border-l-emerald-500' : 'border-l-amber-500'}`}>
@@ -1082,7 +1082,7 @@ export const MunicipalDashboardView: React.FC<MunicipalDashboardViewProps> = ({
 
               {/* AI Prediction Box in Modal */}
               {selectedCase.afterImage && (
-                selectedCase.verification?.status === 'Verified' || selectedCase.status === 'VERIFIED' ? (
+                selectedCase.verification?.status === 'Verified' || selectedCase.status === 'VERIFIED' || selectedCase.status === 'VERIFIED_CLOSED' ? (
                   <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1 text-xs">
                     <span className="font-bold text-emerald-900 flex items-center gap-1.5">
                       <CheckCircle2 size={15} className="text-emerald-600" />

@@ -94,7 +94,7 @@ export const ContractorHome: React.FC<ContractorHomeProps> = ({
   wardFilter = 'all',
   onWardChange,
 }) => {
-  const { workOrders, cases, submitEvidenceHandler, submitExpenseMemoHandler } = useApp();
+  const { wards, workOrders, cases, submitEvidenceHandler, submitExpenseMemoHandler } = useApp();
 
   const [viewMode, setViewMode] = useState<'grouped' | 'list'>('grouped');
   const [selectedOrder, setSelectedOrder] = useState<WorkOrder | null>(null);
@@ -168,7 +168,8 @@ export const ContractorHome: React.FC<ContractorHomeProps> = ({
     const citizenJobs: WorkOrder[] = (cases || [])
       .filter((c) => !existingCaseIds.has(c.id))
       .map((c) => {
-        const wCode = c.wardId || 'G/N';
+        const wardObj = wards?.find((w: any) => w.id === c.wardId);
+        const wCode = wardObj?.code || c.wardId || 'G/N';
         const wDb = WARD_DB_MAP[wCode]?.dbFile || 'contractor_ward_a.db';
         return {
           id: `WO-${c.id}`,

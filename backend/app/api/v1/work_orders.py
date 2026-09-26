@@ -17,9 +17,13 @@ router = APIRouter()
 
 def serialize_work_order(wo: WorkOrder) -> dict:
     case = wo.case
-    before_ev = next((ev for ev in wo.evidence_files if ev.capture_type == "BEFORE"), None)
-    after_ev = next((ev for ev in wo.evidence_files if ev.capture_type == "AFTER"), None)
-    citizen_ev = next((ev for ev in case.evidence_files if ev.capture_type == "CITIZEN"), None) if case else None
+    
+    sorted_wo_ev = sorted(wo.evidence_files, key=lambda x: x.captured_at or datetime.min, reverse=True)
+    before_ev = next((ev for ev in sorted_wo_ev if ev.capture_type == "BEFORE"), None)
+    after_ev = next((ev for ev in sorted_wo_ev if ev.capture_type == "AFTER"), None)
+    
+    sorted_case_ev = sorted(case.evidence_files, key=lambda x: x.captured_at or datetime.min, reverse=True) if case else []
+    citizen_ev = next((ev for ev in sorted_case_ev if ev.capture_type == "CITIZEN"), None)
 
     ward_id_val = case.ward_id if case else None
     ward_code_val = case.ward.code if (case and case.ward) else None
