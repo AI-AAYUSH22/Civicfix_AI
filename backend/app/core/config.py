@@ -71,6 +71,11 @@ class Settings:
     WHATSAPP_BUSINESS_ACCOUNT_ID: str = os.getenv("WHATSAPP_BUSINESS_ACCOUNT_ID", "")
     WHATSAPP_VERIFY_TOKEN: str = os.getenv("WHATSAPP_VERIFY_TOKEN", "civicfix_token_2026")
 
+    # Telegram Integration
+    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "8970450047:AAEXfkh2uX0PKQH4_A1Usnj3iy6xEyVLy3g")
+    TELEGRAM_WEBHOOK_SECRET: str = os.getenv("TELEGRAM_WEBHOOK_SECRET", "civicfix_telegram_secret_2026")
+
+
 
 settings = Settings()
 

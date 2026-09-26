@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import json
 
 from app.core.database import get_db
 from app.api.deps import get_current_user, get_optional_current_user, require_municipal
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.case import Case, CaseLocation
 from app.models.ward import Ward, Road
 from app.models.evidence import EvidenceFile
@@ -31,6 +32,8 @@ def serialize_case(case: Case) -> dict:
         "source_username": getattr(case, "source_username", None),
         "source_url": getattr(case, "source_url", None),
         "citizen_name": getattr(case, "citizen_name", None),
+        "citizen_phone": getattr(case, "citizen_phone", None),
+        "reported_by": getattr(case, "reported_by", None),
         "location_status": getattr(case, "location_status", "RESOLVED"),
         "location_confidence": getattr(case, "location_confidence", 1.0),
         "ward_id": case.ward_id,
@@ -66,6 +69,8 @@ async def create_case(
     severity: str = Form("Medium"),
     landmark: Optional[str] = Form(None),
     address: Optional[str] = Form(None),
+    citizen_phone: Optional[str] = Form(None),
+    citizen_name: Optional[str] = Form(None),
     reporter_email: Optional[str] = Form(None),
     photo: Optional[UploadFile] = File(None),
     ward_id: Optional[str] = Form(None),
@@ -73,9 +78,9 @@ async def create_case(
     db: Session = Depends(get_db)
 ):
     """
-    Citizen reports a pothole with GPS coordinates, description, and optional photo.
+    Citizen reports a pothole with GPS coordinates, description, mobile phone number, and optional photo.
+    Automatically links or creates the citizen User record and persists the phone number and report in the database.
     Automatically assigns nearest ward/road and checks for duplicates.
-    Supports authenticated citizens and guest citizens.
     """
     # 1. Check nearby duplicates
     duplicates = check_nearby_duplicates(db, latitude, longitude, radius_meters=20.0)
@@ -90,10 +95,48 @@ async def create_case(
         if custom_ward:
             ward = custom_ward
 
-    # 3. Create Case
+    # 3. Resolve phone number and citizen profile
+    phone_raw = (citizen_phone or "").strip()
+    if not phone_raw and reporter_email:
+        digits_only = "".join(c for c in reporter_email if c.isdigit())
+        if len(digits_only) >= 10:
+            phone_raw = reporter_email.strip()
+    if not phone_raw and current_user and getattr(current_user, "phone", None):
+        phone_raw = current_user.phone.strip()
+
+    clean_phone = "".join(c for c in phone_raw if c.isdigit() or c == "+") if phone_raw else None
+
+    # Resolve citizen name
+    name_raw = (citizen_name or "").strip()
+    if not name_raw and current_user:
+        name_raw = current_user.full_name or current_user.name
+    if not name_raw and reporter_email and not clean_phone:
+        name_raw = reporter_email.strip()
+    if not name_raw:
+        name_raw = f"Citizen ({clean_phone})" if clean_phone else "Citizen Reporter"
+
+    # Find or link user record in the database
+    reported_by_id = None
+    if current_user:
+        reported_by_id = current_user.id
+        if clean_phone and not current_user.phone:
+            current_user.phone = clean_phone
+            db.add(current_user)
+    elif clean_phone:
+        user = db.query(User).filter(User.phone == clean_phone).first()
+        if not user:
+            user = User(
+                full_name=name_raw,
+                phone=clean_phone,
+                email=f"{clean_phone.replace('+', '')}@citizen.civicfix.internal",
+                role=UserRole.CITIZEN,
+                is_active=True
+            )
+            db.add(user)
+            db.flush()
+        reported_by_id = user.id
+
     title = f"Pothole near {landmark}" if landmark else (f"Pothole on {road.name}" if road else "Road surface defect")
-    reported_by_id = current_user.id if current_user else None
-    citizen_display_name = current_user.full_name if current_user else (reporter_email or "Citizen Web Report")
     
     new_case = Case(
         description=description,
@@ -101,7 +144,8 @@ async def create_case(
         status="REPORTED",
         title=title,
         channel="PORTAL",
-        citizen_name=citizen_display_name,
+        citizen_name=name_raw,
+        citizen_phone=clean_phone,
         ward_id=ward.id if ward else None,
         road_id=road.id if road else None,
         reported_by=reported_by_id,
@@ -139,9 +183,9 @@ async def create_case(
     db.refresh(new_case)
 
     # 6. Log Audit Event & Create Notification
-    actor_identifier = current_user.full_name if current_user else (reporter_email or "Citizen Web")
+    actor_identifier = name_raw or (current_user.full_name if current_user else "Citizen Web")
     actor_role_str = getattr(current_user.role, "value", str(current_user.role)) if current_user else "CITIZEN"
-    actor_id_val = current_user.id if current_user else None
+    actor_id_val = reported_by_id
     
     log_audit_event(
         db=db,
@@ -151,15 +195,15 @@ async def create_case(
         actor_id=actor_id_val,
         actor_name=actor_identifier,
         actor_role=actor_role_str,
-        details={"latitude": latitude, "longitude": longitude, "severity": severity, "duplicate_warning": duplicate_warning}
+        details={"latitude": latitude, "longitude": longitude, "severity": severity, "duplicate_warning": duplicate_warning, "citizen_phone": clean_phone}
     )
-    if current_user:
+    if reported_by_id:
         create_notification(
             db=db,
             title="Complaint Submitted",
             message=f"Case {new_case.id} has been recorded in {ward.name if ward else 'Ward'} and queued for municipal validation.",
             event_type="CASE_CREATED",
-            user_id=current_user.id
+            user_id=reported_by_id
         )
 
     response = serialize_case(new_case)
@@ -190,11 +234,12 @@ def list_cases(
     status: Optional[str] = None,
     ward_id: Optional[str] = None,
     city: Optional[str] = None,
+    citizen_phone: Optional[str] = None,
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
     """
-    List cases with optional filtering.
+    List cases with optional filtering by status, ward, city, or citizen phone number.
     """
     query = db.query(Case)
     if status:
@@ -203,8 +248,39 @@ def list_cases(
         query = query.filter(Case.ward_id == ward_id)
     if city:
         query = query.join(Ward).filter(Ward.city.ilike(f"%{city}%"))
+    if citizen_phone:
+        clean_p = "".join(c for c in citizen_phone if c.isdigit())
+        query = query.filter(
+            or_(
+                Case.citizen_phone == citizen_phone,
+                Case.citizen_phone.ilike(f"%{clean_p}%"),
+                Case.source_id.ilike(f"%{clean_p}%"),
+                Case.citizen_name.ilike(f"%{clean_p}%")
+            )
+        )
 
     cases = query.order_by(Case.created_at.desc()).limit(limit).all()
+    return [serialize_case(c) for c in cases]
+
+@router.get("/by-phone/{phone_number}", response_model=List[dict])
+def get_cases_by_phone(phone_number: str, db: Session = Depends(get_db)):
+    """
+    Fetch all cases reported by a citizen with the given phone number from the database.
+    """
+    clean_p = "".join(c for c in phone_number if c.isdigit())
+    cases = (
+        db.query(Case)
+        .filter(
+            or_(
+                Case.citizen_phone == phone_number,
+                Case.citizen_phone.ilike(f"%{clean_p}%"),
+                Case.source_id.ilike(f"%{clean_p}%"),
+                Case.citizen_name.ilike(f"%{clean_p}%")
+            )
+        )
+        .order_by(Case.created_at.desc())
+        .all()
+    )
     return [serialize_case(c) for c in cases]
 
 @router.get("/my", response_model=List[dict])
@@ -213,11 +289,18 @@ def get_my_cases(
     db: Session = Depends(get_db)
 ):
     """
-    Returns complaints reported by the authenticated citizen.
+    Returns complaints reported by the authenticated citizen (by user ID or matching phone number).
     """
+    filters = [Case.reported_by == current_user.id]
+    if current_user.phone:
+        clean_p = "".join(c for c in current_user.phone if c.isdigit())
+        if clean_p:
+            filters.append(Case.citizen_phone.ilike(f"%{clean_p}%"))
+            filters.append(Case.source_id.ilike(f"%{clean_p}%"))
+    
     cases = (
         db.query(Case)
-        .filter(Case.reported_by == current_user.id)
+        .filter(or_(*filters))
         .order_by(Case.created_at.desc())
         .limit(50)
         .all()

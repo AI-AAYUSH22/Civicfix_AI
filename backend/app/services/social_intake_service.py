@@ -6,6 +6,7 @@ from typing import Optional, Tuple, Dict, Any, List
 from sqlalchemy.orm import Session
 
 from app.models.case import Case, CaseLocation
+from app.models.user import User, UserRole
 from app.models.evidence import EvidenceFile
 from app.models.conversation_state import ConversationState
 from app.services.location_resolver import (
@@ -122,17 +123,43 @@ class SocialIntakeService:
         else:
             severity = "Medium"
 
-        # 6. Construct Case Title
+        # 6. Resolve citizen phone number and citizen profile if available
+        clean_phone = None
+        if channel == "WHATSAPP" or "wa-" in (source_id or ""):
+            phone_cand = (source_id or "").replace("wa-", "").replace("whatsapp:", "").strip()
+            clean_phone = "".join(c for c in phone_cand if c.isdigit() or c == "+")
+        elif raw_metadata and "phone" in raw_metadata:
+            phone_cand = str(raw_metadata["phone"]).strip()
+            clean_phone = "".join(c for c in phone_cand if c.isdigit() or c == "+")
+
+        user_id = None
+        if clean_phone:
+            user = db.query(User).filter(User.phone == clean_phone).first()
+            if not user:
+                user = User(
+                    full_name=username or f"WhatsApp Citizen ({clean_phone})",
+                    phone=clean_phone,
+                    email=f"{clean_phone.replace('+', '')}@whatsapp.civicfix.internal",
+                    role=UserRole.CITIZEN,
+                    is_active=True
+                )
+                db.add(user)
+                db.flush()
+            user_id = user.id
+
+        # 7. Construct Case Title
         title_loc = landmark if landmark else (address or "Road Surface Defect")
         title = f"[{channel}] Pothole near {title_loc}"
 
-        # 7. Create Case in database
+        # 8. Create Case in database
         case_id = f"CF-{uuid.uuid4().hex[:6].upper()}"
         new_case = Case(
             id=case_id,
             channel=channel,
             source_id=source_id,
-            citizen_name=f"{channel.capitalize()} Citizen ({username})",
+            citizen_name=username or (f"WhatsApp Citizen ({clean_phone})" if clean_phone else f"{channel.capitalize()} Citizen"),
+            citizen_phone=clean_phone,
+            reported_by=user_id,
             source_username=username,
             source_url=source_url,
             title=title,
@@ -366,9 +393,28 @@ class SocialIntakeService:
         landmark: Optional[str]
     ) -> str:
         """
-        Generates standard reply prompts for WhatsApp or Reddit.
+        Generates standard reply prompts for Telegram, WhatsApp, or Reddit.
         """
-        if channel == "WHATSAPP":
+        if channel == "TELEGRAM":
+            if loc_status == "RESOLVED":
+                return (
+                    f"✅ *Thank you! Your complaint has been registered.* \n\n"
+                    f"📍 *Case ID:* `{case.id}`\n"
+                    f"🏛️ *Ward:* {case.ward.name if case.ward else 'Municipal Area'}\n"
+                    f"📌 *Location:* {landmark or 'GPS Pin'}\n\n"
+                    f"Our municipal contractor will inspect and repair the site."
+                )
+            elif loc_status == "NEEDS_CLARIFICATION":
+                return (
+                    f"📍 Case `{case.id}` recorded, but location is ambiguous near {landmark or 'this area'}.\n"
+                    f"Please tap 📎 and share your *Location Pin* or reply with a nearby street landmark."
+                )
+            else:
+                return (
+                    f"Thanks for reporting! We couldn't identify the exact location.\n"
+                    f"Please tap 📎 and share your *Location Pin* so we can dispatch the road contractor."
+                )
+        elif channel == "WHATSAPP":
             if loc_status == "RESOLVED":
                 return (
                     f"✅ Thank you! Your pothole complaint has been registered.\n\n"
@@ -410,7 +456,7 @@ class SocialIntakeService:
     ) -> Dict[str, Any]:
         """
         Idempotent notification dispatcher called once AI Verification passes.
-        Notifies original Reddit post or WhatsApp user with repair proof.
+        Notifies original Reddit post, WhatsApp, or Telegram user with repair proof.
         """
         case = db.query(Case).filter(Case.id == case_id).first()
         if not case:
@@ -422,7 +468,7 @@ class SocialIntakeService:
             return {"status": "SKIPPED", "detail": "Notification already dispatched."}
 
         channel = (case.channel or "PORTAL").upper()
-        if channel not in ["WHATSAPP", "REDDIT"]:
+        if channel not in ["WHATSAPP", "REDDIT", "TELEGRAM"]:
             # Standard citizen portal notification
             case.notification_sent = True
             case.last_notification_platform = "PORTAL"
@@ -440,7 +486,18 @@ class SocialIntakeService:
 
         delivery_status = "DELIVERED"
         # 1. Dispatch platform-specific message
-        if channel == "WHATSAPP":
+        if channel == "TELEGRAM":
+            if settings.TELEGRAM_BOT_TOKEN and case.source_id:
+                try:
+                    import asyncio
+                    from app.services.telegram_service import send_telegram_message
+                    chat_id = case.source_id.replace("tg-", "")
+                    asyncio.run(send_telegram_message(chat_id=chat_id, text=notification_text))
+                except Exception as e:
+                    logger.error(f"Failed to dispatch Telegram notification: {e}")
+                    delivery_status = "FAILED"
+        elif channel == "WHATSAPP":
+
             if settings.WHATSAPP_ACCESS_TOKEN and settings.WHATSAPP_PHONE_NUMBER_ID and case.source_id:
                 phone = case.source_id.replace("wa-", "").replace("+", "")
                 try:

@@ -231,3 +231,26 @@ export const mockWorkOrders = [
     coordinates: { lat: 19.1136, lng: 72.8697 },
   },
 ];
+
+import { actualContractors } from './actualContractors';
+
+export interface ContractorAccount {
+  id: string;
+  contractorId: string;
+  password: string;
+  name: string;
+  registrationNo?: string;
+  wardId: string;
+  wardName: string;
+  zone?: string;
+  city: string;
+  phone: string;
+  email: string;
+  performanceScore?: number;
+  lateRepairs?: number;
+  verifiedRepairs?: number;
+  aiRejections?: number;
+}
+
+export const mockContractors: ContractorAccount[] = actualContractors;
+

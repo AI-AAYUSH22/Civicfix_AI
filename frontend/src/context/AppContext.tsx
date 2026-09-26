@@ -30,6 +30,9 @@ interface AppContextType {
   currentUser: any | null;
   wardAssignments: any[];
   loginEngineer: (employeeId: string, password: string) => Promise<any>;
+  loginContractor: (contractorId: string, password: string, wardId?: string) => Promise<any>;
+  loginCitizen: (mobile: string, password: string) => Promise<any>;
+  registerCitizen: (data: any) => Promise<any>;
   logout: () => void;
   refreshData: () => Promise<void>;
   submitComplaint: (formData: FormData) => Promise<ApiCase>;
@@ -90,6 +93,8 @@ function mapApiCaseToFrontend(c: ApiCase): PotholeCase {
     contractor: c.work_order?.contractor_name,
     channel: (c.channel as any) || 'PORTAL',
     citizenName: c.source_username || c.citizen_name || 'Citizen',
+    citizenPhone: c.citizen_phone,
+    reportedBy: c.reported_by,
     sourceUsername: c.source_username,
     sourceUrl: c.source_url,
     locationStatus: c.location_status,
@@ -173,6 +178,65 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     await refreshData();
     return res;
+  };
+
+  const loginContractor = async (contractorId: string, _password: string, wardId?: string) => {
+    const { mockContractors } = await import('@/data/mockData');
+    const cleanId = (contractorId || '').trim().toLowerCase();
+    const found = mockContractors.find(
+      (c) =>
+        c.contractorId.toLowerCase() === cleanId ||
+        c.id.toLowerCase() === cleanId ||
+        c.email.toLowerCase() === cleanId ||
+        (wardId && c.wardId.toLowerCase() === wardId.trim().toLowerCase())
+    );
+    const targetWard = found
+      ? mockWards.find((w) => w.id.toLowerCase() === found.wardId.toLowerCase()) || { id: found.wardId, name: found.wardName, city: found.city }
+      : mockWards[0];
+
+    const user = {
+      role: 'CONTRACTOR',
+      contractor_id: found?.contractorId || contractorId,
+      name: found?.name || `Contractor (${contractorId})`,
+      employee_id: found?.contractorId || contractorId,
+      email: found?.email || `${contractorId.toLowerCase()}@civicfix.org`,
+      assigned_ward: {
+        ward_id: targetWard.id,
+        ward_name: targetWard.name,
+        city: targetWard.city,
+      },
+    };
+    setCurrentUser(user);
+    localStorage.setItem('civicfix_user', JSON.stringify(user));
+    await refreshData();
+    return { user };
+  };
+
+  const loginCitizen = async (mobile: string, _password: string) => {
+    const user = {
+      role: 'CITIZEN',
+      phone: mobile,
+      name: `Citizen (${mobile})`,
+    };
+    setCurrentUser(user);
+    localStorage.setItem('civicfix_user', JSON.stringify(user));
+    await refreshData();
+    return { user };
+  };
+
+  const registerCitizen = async (data: any) => {
+    const user = {
+      role: 'CITIZEN',
+      phone: data.phone,
+      name: data.name,
+      assigned_ward: {
+        ward_id: data.wardId || 'G/N',
+      },
+    };
+    setCurrentUser(user);
+    localStorage.setItem('civicfix_user', JSON.stringify(user));
+    await refreshData();
+    return { user };
   };
 
   const logout = () => {
@@ -397,6 +461,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         currentUser,
         wardAssignments,
         loginEngineer,
+        loginContractor,
+        loginCitizen,
+        registerCitizen,
         logout,
         refreshData,
         submitComplaint,

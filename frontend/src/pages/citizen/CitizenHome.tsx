@@ -29,7 +29,7 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
   autoOpenCamera = false,
   onReportClose,
 }) => {
-  const { cases, submitComplaint } = useApp();
+  const { cases, currentUser, submitComplaint } = useApp();
 
   const [reportModalOpen, setReportModalOpen] = useState(autoOpenCamera);
   const [reportStep, setReportStep] = useState<number>(autoOpenCamera ? 2 : 1);
@@ -44,6 +44,8 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
   const [createdCase, setCreatedCase] = useState<any | null>(null);
   const [selectedCase, setSelectedCase] = useState<PotholeCase | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [reporterPhone, setReporterPhone] = useState(currentUser?.phone || '9820012345');
+  const [reporterName, setReporterName] = useState(currentUser?.name || 'Aarav Sharma');
   const [aiResult, setAiResult] = useState<{ is_pothole: boolean; confidence: number; estimated_size_sqm: number; message: string } | null>(null);
   const [analyzingPhoto, setAnalyzingPhoto] = useState(false);
   const [fetchingGPS, setFetchingGPS] = useState(false);
@@ -294,9 +296,29 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
     }
   }, []);
 
-  // Active cases reported by citizens
-  const activeCases = cases.filter((c) => c.status !== 'CLOSED');
-  const resolvedCases = cases.filter((c) => c.status === 'VERIFIED' || c.status === 'CLOSED');
+  // Strict Citizen Data Isolation: Only show complaints reported by THIS citizen
+  const citizenCases = React.useMemo(() => {
+    if (!currentUser) return cases;
+
+    const userPhone = (currentUser.phone || '').replace(/[^0-9]/g, '');
+    const userName = (currentUser.name || '').toLowerCase().trim();
+
+    return cases.filter((c) => {
+      if (c.reportedBy && currentUser.id && c.reportedBy === currentUser.id) return true;
+      const cName = (c.citizenName || c.sourceUsername || '').toLowerCase().trim();
+      const cPhone = (c.citizenPhone || c.citizenName || c.sourceUsername || '').replace(/[^0-9]/g, '');
+
+      if (userPhone && cPhone && (cPhone.includes(userPhone) || userPhone.includes(cPhone))) return true;
+      if (userName && cName && (cName.includes(userName) || userName.includes(cName))) return true;
+      if (c.citizenName && currentUser.phone && c.citizenName.includes(currentUser.phone)) return true;
+      if (c.citizenName && currentUser.name && c.citizenName.includes(currentUser.name)) return true;
+
+      return false;
+    });
+  }, [cases, currentUser]);
+
+  const activeCases = citizenCases.filter((c) => c.status !== 'CLOSED');
+  const resolvedCases = citizenCases.filter((c) => c.status === 'VERIFIED' || c.status === 'CLOSED');
 
   const handleOpenReport = (directToCamera = false) => {
     setReportStep(directToCamera ? 2 : 1);
@@ -395,6 +417,9 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
       formData.append('severity', severity);
       formData.append('address', address);
       formData.append('landmark', landmark);
+      formData.append('citizen_phone', reporterPhone || currentUser?.phone || '');
+      formData.append('citizen_name', reporterName || currentUser?.name || 'Citizen');
+      formData.append('reporter_email', reporterPhone || currentUser?.phone || currentUser?.name || 'Citizen Report');
       if (detectedWard?.ward_id) {
         formData.append('ward_id', detectedWard.ward_id);
       }
@@ -1039,6 +1064,32 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
                   className="w-full bg-white border border-[#CBD5E1] rounded-lg p-2.5 text-xs text-[#172033]"
                 />
               </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                <div>
+                  <label className="font-semibold text-[#172033] block mb-1">
+                    📱 Mobile Number (Saved in DB):
+                  </label>
+                  <input
+                    type="tel"
+                    value={reporterPhone}
+                    onChange={(e) => setReporterPhone(e.target.value)}
+                    placeholder="e.g. 9820012345"
+                    className="w-full bg-white border border-[#CBD5E1] rounded-lg px-2.5 py-1.5 text-xs text-[#172033] font-semibold focus:ring-1 focus:ring-teal-500"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-[#172033] block mb-1">
+                    👤 Citizen Full Name:
+                  </label>
+                  <input
+                    type="text"
+                    value={reporterName}
+                    onChange={(e) => setReporterName(e.target.value)}
+                    placeholder="e.g. Aarav Sharma"
+                    className="w-full bg-white border border-[#CBD5E1] rounded-lg px-2.5 py-1.5 text-xs text-[#172033] focus:ring-1 focus:ring-teal-500"
+                  />
+                </div>
+              </div>
               <div>
                 <label className="font-semibold text-[#172033] block mb-1">Severity Level:</label>
                 <div className="grid grid-cols-3 gap-2">
@@ -1109,6 +1160,16 @@ export const CitizenHome: React.FC<CitizenHomeProps> = ({
               <div>
                 <span className="text-[#64748B]">Severity:</span>
                 <p className="font-semibold text-[#172033] mt-0.5">{selectedCase.severity}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+              <div>
+                <span className="text-[#64748B] block text-[11px]">Reported By:</span>
+                <p className="font-semibold text-[#172033] mt-0.5">{selectedCase.citizenName || 'Citizen'}</p>
+              </div>
+              <div>
+                <span className="text-[#64748B] block text-[11px]">Citizen Phone:</span>
+                <p className="font-semibold text-[#0F766E] mt-0.5">{selectedCase.citizenPhone || 'Registered in DB'}</p>
               </div>
             </div>
             <div>

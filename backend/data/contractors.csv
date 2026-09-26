@@ -1,0 +1,251 @@
+contractor_id,contractor_name,registration_no,ward,zone,performance_score,late_repairs,verified_repairs,ai_rejections
+C001,Western Civil Pvt Ltd 1,BMC-RT-2025-001,R Central,Borivali,56,23,160,3
+C002,Metro Asphalt Pvt Ltd 2,BMC-RT-2025-002,G North,Central,61,21,399,8
+C003,Shiv Shakti Pvt Ltd 3,BMC-RT-2025-003,C,City,57,0,67,3
+C004,City Build Pvt Ltd 4,BMC-RT-2025-004,G North,Central,93,0,307,3
+C005,City Build Pvt Ltd 5,BMC-RT-2025-005,S,Powai,81,7,249,4
+C006,Metro Asphalt Pvt Ltd 6,BMC-RT-2025-006,A,City,82,10,162,2
+C007,Prime Infra Pvt Ltd 7,BMC-RT-2025-007,F South,South Central,61,2,214,1
+C008,Prime Infra Pvt Ltd 8,BMC-RT-2025-008,K East,Andheri,93,8,42,7
+C009,Western Civil Pvt Ltd 9,BMC-RT-2025-009,P North,Malad,79,2,302,4
+C010,Prime Infra Pvt Ltd 10,BMC-RT-2025-010,R Central,Borivali,91,6,380,1
+C011,Skyline Roads Pvt Ltd 11,BMC-RT-2025-011,B,City,73,2,139,1
+C012,Urban Concrete Pvt Ltd 12,BMC-RT-2025-012,K West,Andheri,84,20,206,2
+C013,Prime Infra Pvt Ltd 13,BMC-RT-2025-013,K East,Andheri,68,21,156,1
+C014,Metro Asphalt Pvt Ltd 14,BMC-RT-2025-014,R North,Borivali,89,23,145,2
+C015,Shiv Shakti Pvt Ltd 15,BMC-RT-2025-015,M East,Chembur,72,29,347,8
+C016,Prime Infra Pvt Ltd 16,BMC-RT-2025-016,G North,Central,58,7,36,5
+C017,Urban Concrete Pvt Ltd 17,BMC-RT-2025-017,K West,Andheri,59,6,310,5
+C018,Apex Roads Pvt Ltd 18,BMC-RT-2025-018,F South,South Central,80,28,349,7
+C019,Urban Concrete Pvt Ltd 19,BMC-RT-2025-019,E,City,63,7,307,8
+C020,Shiv Shakti Pvt Ltd 20,BMC-RT-2025-020,G South,Central,92,12,205,3
+C021,City Build Pvt Ltd 21,BMC-RT-2025-021,E,City,86,2,44,1
+C022,Metro Asphalt Pvt Ltd 22,BMC-RT-2025-022,E,City,98,13,325,1
+C023,Shiv Shakti Pvt Ltd 23,BMC-RT-2025-023,K West,Andheri,93,14,290,4
+C024,RoadBuild Pvt Ltd 24,BMC-RT-2025-024,P North,Malad,98,23,78,8
+C025,Prime Infra Pvt Ltd 25,BMC-RT-2025-025,G South,Central,62,9,242,2
+C026,RoadBuild Pvt Ltd 26,BMC-RT-2025-026,M East,Chembur,71,16,111,8
+C027,Urban Concrete Pvt Ltd 27,BMC-RT-2025-027,D,City,95,16,331,3
+C028,Prime Infra Pvt Ltd 28,BMC-RT-2025-028,E,City,65,17,291,0
+C029,Prime Infra Pvt Ltd 29,BMC-RT-2025-029,R North,Borivali,86,0,77,5
+C030,Skyline Roads Pvt Ltd 30,BMC-RT-2025-030,H East,West,58,7,310,1
+C031,Apex Roads Pvt Ltd 31,BMC-RT-2025-031,C,City,59,24,292,2
+C032,Apex Roads Pvt Ltd 32,BMC-RT-2025-032,E,City,90,5,155,8
+C033,Shiv Shakti Pvt Ltd 33,BMC-RT-2025-033,R North,Borivali,68,29,296,3
+C034,Urban Concrete Pvt Ltd 34,BMC-RT-2025-034,S,Powai,80,21,352,5
+C035,City Build Pvt Ltd 35,BMC-RT-2025-035,M East,Chembur,83,3,146,3
+C036,Prime Infra Pvt Ltd 36,BMC-RT-2025-036,C,City,56,18,303,3
+C037,Skyline Roads Pvt Ltd 37,BMC-RT-2025-037,P South,Malad,55,2,382,0
+C038,Western Civil Pvt Ltd 38,BMC-RT-2025-038,G North,Central,57,27,189,1
+C039,Skyline Roads Pvt Ltd 39,BMC-RT-2025-039,N,Ghatkopar,72,21,268,3
+C040,Metro Asphalt Pvt Ltd 40,BMC-RT-2025-040,P North,Malad,91,18,262,3
+C041,Shiv Shakti Pvt Ltd 41,BMC-RT-2025-041,M West,Chembur,67,3,69,6
+C042,Shiv Shakti Pvt Ltd 42,BMC-RT-2025-042,K East,Andheri,81,14,393,0
+C043,Western Civil Pvt Ltd 43,BMC-RT-2025-043,R South,Borivali,58,12,392,5
+C044,Skyline Roads Pvt Ltd 44,BMC-RT-2025-044,D,City,67,6,294,7
+C045,Shiv Shakti Pvt Ltd 45,BMC-RT-2025-045,E,City,66,8,256,3
+C046,Apex Roads Pvt Ltd 46,BMC-RT-2025-046,C,City,90,3,45,8
+C047,Western Civil Pvt Ltd 47,BMC-RT-2025-047,A,City,70,5,228,7
+C048,Skyline Roads Pvt Ltd 48,BMC-RT-2025-048,M West,Chembur,80,28,50,2
+C049,RoadBuild Pvt Ltd 49,BMC-RT-2025-049,K West,Andheri,79,8,252,4
+C050,City Build Pvt Ltd 50,BMC-RT-2025-050,L,Kurla,97,22,269,2
+C051,Urban Concrete Pvt Ltd 51,BMC-RT-2025-051,F South,South Central,68,30,49,8
+C052,Prime Infra Pvt Ltd 52,BMC-RT-2025-052,B,City,58,1,319,7
+C053,City Build Pvt Ltd 53,BMC-RT-2025-053,N,Ghatkopar,65,1,280,1
+C054,Western Civil Pvt Ltd 54,BMC-RT-2025-054,F North,South Central,93,2,365,3
+C055,Western Civil Pvt Ltd 55,BMC-RT-2025-055,K West,Andheri,91,7,316,0
+C056,Western Civil Pvt Ltd 56,BMC-RT-2025-056,R North,Borivali,81,21,318,8
+C057,Urban Concrete Pvt Ltd 57,BMC-RT-2025-057,H West,West,68,21,386,5
+C058,Urban Concrete Pvt Ltd 58,BMC-RT-2025-058,G North,Central,80,4,363,4
+C059,Prime Infra Pvt Ltd 59,BMC-RT-2025-059,M East,Chembur,59,0,254,1
+C060,City Build Pvt Ltd 60,BMC-RT-2025-060,C,City,68,16,155,2
+C061,Western Civil Pvt Ltd 61,BMC-RT-2025-061,K East,Andheri,70,11,165,2
+C062,City Build Pvt Ltd 62,BMC-RT-2025-062,M East,Chembur,74,19,354,8
+C063,City Build Pvt Ltd 63,BMC-RT-2025-063,A,City,74,29,359,1
+C064,Urban Concrete Pvt Ltd 64,BMC-RT-2025-064,E,City,62,28,74,8
+C065,Urban Concrete Pvt Ltd 65,BMC-RT-2025-065,E,City,73,19,127,5
+C066,Urban Concrete Pvt Ltd 66,BMC-RT-2025-066,F South,South Central,87,15,148,0
+C067,Shiv Shakti Pvt Ltd 67,BMC-RT-2025-067,C,City,72,1,21,5
+C068,Urban Concrete Pvt Ltd 68,BMC-RT-2025-068,E,City,65,23,246,8
+C069,Shiv Shakti Pvt Ltd 69,BMC-RT-2025-069,S,Powai,90,0,77,1
+C070,Metro Asphalt Pvt Ltd 70,BMC-RT-2025-070,S,Powai,89,1,209,8
+C071,Shiv Shakti Pvt Ltd 71,BMC-RT-2025-071,E,City,63,1,177,5
+C072,Prime Infra Pvt Ltd 72,BMC-RT-2025-072,B,City,68,21,147,1
+C073,City Build Pvt Ltd 73,BMC-RT-2025-073,K East,Andheri,81,19,99,3
+C074,Metro Asphalt Pvt Ltd 74,BMC-RT-2025-074,F North,South Central,81,0,111,5
+C075,Skyline Roads Pvt Ltd 75,BMC-RT-2025-075,L,Kurla,72,5,379,1
+C076,RoadBuild Pvt Ltd 76,BMC-RT-2025-076,K West,Andheri,85,7,122,7
+C077,Urban Concrete Pvt Ltd 77,BMC-RT-2025-077,K East,Andheri,69,7,32,3
+C078,Prime Infra Pvt Ltd 78,BMC-RT-2025-078,K West,Andheri,72,27,55,4
+C079,City Build Pvt Ltd 79,BMC-RT-2025-079,K East,Andheri,80,21,294,5
+C080,Western Civil Pvt Ltd 80,BMC-RT-2025-080,A,City,71,5,317,4
+C081,Western Civil Pvt Ltd 81,BMC-RT-2025-081,B,City,93,13,196,5
+C082,City Build Pvt Ltd 82,BMC-RT-2025-082,L,Kurla,62,12,315,3
+C083,RoadBuild Pvt Ltd 83,BMC-RT-2025-083,G South,Central,82,0,286,8
+C084,Skyline Roads Pvt Ltd 84,BMC-RT-2025-084,R South,Borivali,78,13,55,5
+C085,Prime Infra Pvt Ltd 85,BMC-RT-2025-085,R North,Borivali,97,27,83,4
+C086,Urban Concrete Pvt Ltd 86,BMC-RT-2025-086,N,Ghatkopar,97,13,187,6
+C087,Urban Concrete Pvt Ltd 87,BMC-RT-2025-087,S,Powai,90,4,118,6
+C088,Shiv Shakti Pvt Ltd 88,BMC-RT-2025-088,R South,Borivali,98,23,109,4
+C089,City Build Pvt Ltd 89,BMC-RT-2025-089,K West,Andheri,55,9,166,3
+C090,Prime Infra Pvt Ltd 90,BMC-RT-2025-090,L,Kurla,84,14,246,3
+C091,Apex Roads Pvt Ltd 91,BMC-RT-2025-091,N,Ghatkopar,65,21,63,4
+C092,Prime Infra Pvt Ltd 92,BMC-RT-2025-092,N,Ghatkopar,60,26,140,4
+C093,Skyline Roads Pvt Ltd 93,BMC-RT-2025-093,G North,Central,64,0,43,3
+C094,Western Civil Pvt Ltd 94,BMC-RT-2025-094,M West,Chembur,84,13,342,3
+C095,Shiv Shakti Pvt Ltd 95,BMC-RT-2025-095,S,Powai,86,12,144,2
+C096,RoadBuild Pvt Ltd 96,BMC-RT-2025-096,R Central,Borivali,61,24,237,3
+C097,City Build Pvt Ltd 97,BMC-RT-2025-097,F North,South Central,84,1,305,3
+C098,Apex Roads Pvt Ltd 98,BMC-RT-2025-098,D,City,63,25,257,8
+C099,Prime Infra Pvt Ltd 99,BMC-RT-2025-099,P North,Malad,83,19,388,8
+C100,City Build Pvt Ltd 100,BMC-RT-2025-100,L,Kurla,83,28,101,7
+C101,Urban Concrete Pvt Ltd 101,BMC-RT-2025-101,M East,Chembur,70,26,346,4
+C102,Apex Roads Pvt Ltd 102,BMC-RT-2025-102,N,Ghatkopar,95,7,160,7
+C103,Urban Concrete Pvt Ltd 103,BMC-RT-2025-103,C,City,70,8,191,5
+C104,Western Civil Pvt Ltd 104,BMC-RT-2025-104,P North,Malad,63,4,138,6
+C105,Metro Asphalt Pvt Ltd 105,BMC-RT-2025-105,S,Powai,68,2,232,6
+C106,City Build Pvt Ltd 106,BMC-RT-2025-106,H West,West,84,13,51,3
+C107,Shiv Shakti Pvt Ltd 107,BMC-RT-2025-107,L,Kurla,92,30,376,0
+C108,Shiv Shakti Pvt Ltd 108,BMC-RT-2025-108,P South,Malad,85,0,200,4
+C109,Shiv Shakti Pvt Ltd 109,BMC-RT-2025-109,K West,Andheri,89,23,396,8
+C110,Skyline Roads Pvt Ltd 110,BMC-RT-2025-110,R North,Borivali,86,7,159,6
+C111,RoadBuild Pvt Ltd 111,BMC-RT-2025-111,M West,Chembur,79,10,362,6
+C112,Metro Asphalt Pvt Ltd 112,BMC-RT-2025-112,T,Mulund,84,29,85,8
+C113,Shiv Shakti Pvt Ltd 113,BMC-RT-2025-113,A,City,92,18,359,0
+C114,Shiv Shakti Pvt Ltd 114,BMC-RT-2025-114,C,City,63,27,256,2
+C115,Urban Concrete Pvt Ltd 115,BMC-RT-2025-115,B,City,79,10,128,7
+C116,Prime Infra Pvt Ltd 116,BMC-RT-2025-116,H West,West,79,8,235,4
+C117,Apex Roads Pvt Ltd 117,BMC-RT-2025-117,C,City,56,23,296,0
+C118,Skyline Roads Pvt Ltd 118,BMC-RT-2025-118,K East,Andheri,96,2,353,0
+C119,Skyline Roads Pvt Ltd 119,BMC-RT-2025-119,A,City,67,26,30,2
+C120,Metro Asphalt Pvt Ltd 120,BMC-RT-2025-120,G North,Central,85,21,78,3
+C121,Urban Concrete Pvt Ltd 121,BMC-RT-2025-121,M East,Chembur,78,5,330,1
+C122,Urban Concrete Pvt Ltd 122,BMC-RT-2025-122,F North,South Central,61,18,33,4
+C123,Shiv Shakti Pvt Ltd 123,BMC-RT-2025-123,P South,Malad,80,30,386,3
+C124,Skyline Roads Pvt Ltd 124,BMC-RT-2025-124,C,City,61,22,174,1
+C125,RoadBuild Pvt Ltd 125,BMC-RT-2025-125,P South,Malad,77,17,239,5
+C126,City Build Pvt Ltd 126,BMC-RT-2025-126,C,City,96,10,26,6
+C127,Western Civil Pvt Ltd 127,BMC-RT-2025-127,M West,Chembur,82,30,205,7
+C128,Metro Asphalt Pvt Ltd 128,BMC-RT-2025-128,S,Powai,82,5,395,8
+C129,Urban Concrete Pvt Ltd 129,BMC-RT-2025-129,R Central,Borivali,94,25,295,7
+C130,Shiv Shakti Pvt Ltd 130,BMC-RT-2025-130,M East,Chembur,92,8,185,3
+C131,Urban Concrete Pvt Ltd 131,BMC-RT-2025-131,C,City,83,7,257,6
+C132,RoadBuild Pvt Ltd 132,BMC-RT-2025-132,H West,West,86,27,186,2
+C133,Skyline Roads Pvt Ltd 133,BMC-RT-2025-133,M West,Chembur,77,25,152,5
+C134,Urban Concrete Pvt Ltd 134,BMC-RT-2025-134,G South,Central,90,0,284,3
+C135,Skyline Roads Pvt Ltd 135,BMC-RT-2025-135,C,City,81,15,304,3
+C136,Apex Roads Pvt Ltd 136,BMC-RT-2025-136,S,Powai,96,22,271,7
+C137,Western Civil Pvt Ltd 137,BMC-RT-2025-137,A,City,73,7,227,3
+C138,Prime Infra Pvt Ltd 138,BMC-RT-2025-138,H East,West,85,17,291,5
+C139,City Build Pvt Ltd 139,BMC-RT-2025-139,L,Kurla,76,11,379,7
+C140,Urban Concrete Pvt Ltd 140,BMC-RT-2025-140,G South,Central,71,7,81,3
+C141,Western Civil Pvt Ltd 141,BMC-RT-2025-141,H West,West,89,30,373,2
+C142,Skyline Roads Pvt Ltd 142,BMC-RT-2025-142,F South,South Central,85,8,390,8
+C143,Urban Concrete Pvt Ltd 143,BMC-RT-2025-143,R North,Borivali,61,26,119,4
+C144,Prime Infra Pvt Ltd 144,BMC-RT-2025-144,G North,Central,66,9,27,8
+C145,Urban Concrete Pvt Ltd 145,BMC-RT-2025-145,E,City,57,1,303,4
+C146,Metro Asphalt Pvt Ltd 146,BMC-RT-2025-146,S,Powai,95,27,271,1
+C147,Urban Concrete Pvt Ltd 147,BMC-RT-2025-147,A,City,85,15,245,5
+C148,RoadBuild Pvt Ltd 148,BMC-RT-2025-148,F North,South Central,71,30,264,1
+C149,Shiv Shakti Pvt Ltd 149,BMC-RT-2025-149,C,City,86,2,315,0
+C150,Metro Asphalt Pvt Ltd 150,BMC-RT-2025-150,E,City,91,30,175,1
+C151,Western Civil Pvt Ltd 151,BMC-RT-2025-151,G North,Central,90,24,233,3
+C152,Shiv Shakti Pvt Ltd 152,BMC-RT-2025-152,N,Ghatkopar,83,29,246,4
+C153,Shiv Shakti Pvt Ltd 153,BMC-RT-2025-153,P South,Malad,74,18,337,0
+C154,Western Civil Pvt Ltd 154,BMC-RT-2025-154,R North,Borivali,68,20,128,4
+C155,Western Civil Pvt Ltd 155,BMC-RT-2025-155,R South,Borivali,65,7,108,8
+C156,Metro Asphalt Pvt Ltd 156,BMC-RT-2025-156,C,City,55,13,250,7
+C157,RoadBuild Pvt Ltd 157,BMC-RT-2025-157,H East,West,69,9,381,4
+C158,Apex Roads Pvt Ltd 158,BMC-RT-2025-158,S,Powai,59,21,139,4
+C159,Skyline Roads Pvt Ltd 159,BMC-RT-2025-159,R Central,Borivali,82,3,298,3
+C160,Metro Asphalt Pvt Ltd 160,BMC-RT-2025-160,R Central,Borivali,72,26,92,1
+C161,Metro Asphalt Pvt Ltd 161,BMC-RT-2025-161,B,City,74,19,311,4
+C162,Western Civil Pvt Ltd 162,BMC-RT-2025-162,M East,Chembur,84,22,175,6
+C163,City Build Pvt Ltd 163,BMC-RT-2025-163,G South,Central,89,15,244,1
+C164,RoadBuild Pvt Ltd 164,BMC-RT-2025-164,R North,Borivali,82,23,185,4
+C165,Western Civil Pvt Ltd 165,BMC-RT-2025-165,A,City,69,30,365,0
+C166,Urban Concrete Pvt Ltd 166,BMC-RT-2025-166,R South,Borivali,91,1,109,7
+C167,Apex Roads Pvt Ltd 167,BMC-RT-2025-167,N,Ghatkopar,72,5,319,6
+C168,Apex Roads Pvt Ltd 168,BMC-RT-2025-168,R Central,Borivali,60,15,198,6
+C169,Prime Infra Pvt Ltd 169,BMC-RT-2025-169,H West,West,97,3,102,5
+C170,Apex Roads Pvt Ltd 170,BMC-RT-2025-170,L,Kurla,73,21,225,8
+C171,Apex Roads Pvt Ltd 171,BMC-RT-2025-171,B,City,60,10,149,5
+C172,Shiv Shakti Pvt Ltd 172,BMC-RT-2025-172,D,City,87,26,20,8
+C173,Shiv Shakti Pvt Ltd 173,BMC-RT-2025-173,M East,Chembur,58,6,285,5
+C174,Apex Roads Pvt Ltd 174,BMC-RT-2025-174,R North,Borivali,95,14,46,3
+C175,City Build Pvt Ltd 175,BMC-RT-2025-175,G South,Central,63,29,167,7
+C176,Apex Roads Pvt Ltd 176,BMC-RT-2025-176,S,Powai,62,0,342,3
+C177,Metro Asphalt Pvt Ltd 177,BMC-RT-2025-177,S,Powai,74,17,27,8
+C178,Western Civil Pvt Ltd 178,BMC-RT-2025-178,L,Kurla,69,26,78,7
+C179,Metro Asphalt Pvt Ltd 179,BMC-RT-2025-179,D,City,86,29,386,4
+C180,Urban Concrete Pvt Ltd 180,BMC-RT-2025-180,N,Ghatkopar,81,26,267,7
+C181,Apex Roads Pvt Ltd 181,BMC-RT-2025-181,G North,Central,90,4,216,3
+C182,City Build Pvt Ltd 182,BMC-RT-2025-182,R North,Borivali,63,27,55,4
+C183,Prime Infra Pvt Ltd 183,BMC-RT-2025-183,L,Kurla,87,8,21,4
+C184,Urban Concrete Pvt Ltd 184,BMC-RT-2025-184,T,Mulund,92,18,357,7
+C185,Apex Roads Pvt Ltd 185,BMC-RT-2025-185,E,City,89,15,196,5
+C186,City Build Pvt Ltd 186,BMC-RT-2025-186,P North,Malad,79,14,184,3
+C187,Skyline Roads Pvt Ltd 187,BMC-RT-2025-187,S,Powai,91,12,139,6
+C188,Prime Infra Pvt Ltd 188,BMC-RT-2025-188,B,City,85,22,215,6
+C189,Metro Asphalt Pvt Ltd 189,BMC-RT-2025-189,R South,Borivali,86,30,38,2
+C190,Prime Infra Pvt Ltd 190,BMC-RT-2025-190,N,Ghatkopar,61,27,245,1
+C191,Apex Roads Pvt Ltd 191,BMC-RT-2025-191,N,Ghatkopar,55,23,93,6
+C192,Metro Asphalt Pvt Ltd 192,BMC-RT-2025-192,R Central,Borivali,59,15,155,5
+C193,Shiv Shakti Pvt Ltd 193,BMC-RT-2025-193,R North,Borivali,96,2,188,8
+C194,Prime Infra Pvt Ltd 194,BMC-RT-2025-194,K West,Andheri,95,22,269,8
+C195,Western Civil Pvt Ltd 195,BMC-RT-2025-195,B,City,70,20,370,4
+C196,Western Civil Pvt Ltd 196,BMC-RT-2025-196,G North,Central,82,3,344,1
+C197,Metro Asphalt Pvt Ltd 197,BMC-RT-2025-197,M East,Chembur,74,28,34,0
+C198,RoadBuild Pvt Ltd 198,BMC-RT-2025-198,H West,West,73,11,211,6
+C199,Skyline Roads Pvt Ltd 199,BMC-RT-2025-199,E,City,88,13,309,2
+C200,Metro Asphalt Pvt Ltd 200,BMC-RT-2025-200,F North,South Central,60,19,215,3
+C201,Metro Asphalt Pvt Ltd 201,BMC-RT-2025-201,M West,Chembur,69,14,346,4
+C202,Urban Concrete Pvt Ltd 202,BMC-RT-2025-202,M East,Chembur,97,0,258,4
+C203,City Build Pvt Ltd 203,BMC-RT-2025-203,R South,Borivali,65,2,246,5
+C204,Urban Concrete Pvt Ltd 204,BMC-RT-2025-204,P South,Malad,95,30,237,4
+C205,Urban Concrete Pvt Ltd 205,BMC-RT-2025-205,M East,Chembur,67,12,267,1
+C206,Shiv Shakti Pvt Ltd 206,BMC-RT-2025-206,G North,Central,91,11,314,4
+C207,Urban Concrete Pvt Ltd 207,BMC-RT-2025-207,S,Powai,56,26,357,6
+C208,RoadBuild Pvt Ltd 208,BMC-RT-2025-208,G South,Central,91,27,371,0
+C209,Apex Roads Pvt Ltd 209,BMC-RT-2025-209,R North,Borivali,73,24,137,5
+C210,Skyline Roads Pvt Ltd 210,BMC-RT-2025-210,G North,Central,94,8,367,2
+C211,Western Civil Pvt Ltd 211,BMC-RT-2025-211,R Central,Borivali,95,20,40,4
+C212,RoadBuild Pvt Ltd 212,BMC-RT-2025-212,M East,Chembur,92,11,394,2
+C213,Urban Concrete Pvt Ltd 213,BMC-RT-2025-213,C,City,75,23,232,2
+C214,Metro Asphalt Pvt Ltd 214,BMC-RT-2025-214,F South,South Central,89,28,207,8
+C215,Urban Concrete Pvt Ltd 215,BMC-RT-2025-215,N,Ghatkopar,65,8,266,4
+C216,Prime Infra Pvt Ltd 216,BMC-RT-2025-216,T,Mulund,62,14,58,2
+C217,Shiv Shakti Pvt Ltd 217,BMC-RT-2025-217,G North,Central,90,11,66,6
+C218,Urban Concrete Pvt Ltd 218,BMC-RT-2025-218,A,City,89,3,252,5
+C219,Urban Concrete Pvt Ltd 219,BMC-RT-2025-219,R South,Borivali,92,12,346,5
+C220,Skyline Roads Pvt Ltd 220,BMC-RT-2025-220,D,City,85,0,337,8
+C221,Skyline Roads Pvt Ltd 221,BMC-RT-2025-221,H West,West,96,2,345,7
+C222,Urban Concrete Pvt Ltd 222,BMC-RT-2025-222,S,Powai,96,13,79,2
+C223,RoadBuild Pvt Ltd 223,BMC-RT-2025-223,B,City,74,15,79,1
+C224,City Build Pvt Ltd 224,BMC-RT-2025-224,G North,Central,63,12,252,5
+C225,City Build Pvt Ltd 225,BMC-RT-2025-225,R South,Borivali,81,18,400,2
+C226,Western Civil Pvt Ltd 226,BMC-RT-2025-226,L,Kurla,86,19,228,4
+C227,Prime Infra Pvt Ltd 227,BMC-RT-2025-227,B,City,68,14,247,3
+C228,Western Civil Pvt Ltd 228,BMC-RT-2025-228,K East,Andheri,98,11,298,5
+C229,Shiv Shakti Pvt Ltd 229,BMC-RT-2025-229,B,City,72,6,82,7
+C230,Skyline Roads Pvt Ltd 230,BMC-RT-2025-230,C,City,96,20,325,0
+C231,Prime Infra Pvt Ltd 231,BMC-RT-2025-231,B,City,70,4,309,3
+C232,City Build Pvt Ltd 232,BMC-RT-2025-232,C,City,68,18,130,3
+C233,Metro Asphalt Pvt Ltd 233,BMC-RT-2025-233,H West,West,93,0,161,2
+C234,City Build Pvt Ltd 234,BMC-RT-2025-234,E,City,71,25,109,1
+C235,RoadBuild Pvt Ltd 235,BMC-RT-2025-235,R South,Borivali,63,0,203,3
+C236,Prime Infra Pvt Ltd 236,BMC-RT-2025-236,P South,Malad,56,5,155,0
+C237,Shiv Shakti Pvt Ltd 237,BMC-RT-2025-237,E,City,88,3,52,7
+C238,Prime Infra Pvt Ltd 238,BMC-RT-2025-238,M East,Chembur,87,18,75,7
+C239,Skyline Roads Pvt Ltd 239,BMC-RT-2025-239,N,Ghatkopar,94,1,392,8
+C240,Apex Roads Pvt Ltd 240,BMC-RT-2025-240,H East,West,96,30,35,0
+C241,Shiv Shakti Pvt Ltd 241,BMC-RT-2025-241,M West,Chembur,82,21,75,7
+C242,Apex Roads Pvt Ltd 242,BMC-RT-2025-242,S,Powai,59,28,61,5
+C243,Metro Asphalt Pvt Ltd 243,BMC-RT-2025-243,R North,Borivali,59,4,160,8
+C244,Prime Infra Pvt Ltd 244,BMC-RT-2025-244,S,Powai,79,19,291,4
+C245,City Build Pvt Ltd 245,BMC-RT-2025-245,M East,Chembur,93,13,70,1
+C246,City Build Pvt Ltd 246,BMC-RT-2025-246,R Central,Borivali,68,13,251,3
+C247,Prime Infra Pvt Ltd 247,BMC-RT-2025-247,L,Kurla,84,12,232,1
+C248,Shiv Shakti Pvt Ltd 248,BMC-RT-2025-248,H West,West,75,21,150,5
+C249,Apex Roads Pvt Ltd 249,BMC-RT-2025-249,E,City,59,2,63,1
+C250,Western Civil Pvt Ltd 250,BMC-RT-2025-250,L,Kurla,78,25,86,8

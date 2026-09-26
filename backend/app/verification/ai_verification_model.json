@@ -1,0 +1,29 @@
+{
+  "trained_at": "2026-09-26T19:27:15.085799",
+  "total_samples": 10000,
+  "r2_score": 0.0,
+  "mean_absolute_error": 27.75,
+  "root_mean_squared_error": 34.16,
+  "raw_feature_coefficients": [
+    26.9772,
+    25.9785,
+    26.7374,
+    26.2187,
+    26.7034
+  ],
+  "feature_weights": {
+    "GPS": 0.2034,
+    "PERSPECTIVE": 0.1959,
+    "LANDMARK": 0.2016,
+    "POTHOLE": 0.1977,
+    "INTEGRITY": 0.2014
+  },
+  "pass_threshold": 66.0,
+  "feature_names": [
+    "GPS",
+    "PERSPECTIVE",
+    "LANDMARK",
+    "POTHOLE",
+    "INTEGRITY"
+  ]
+}

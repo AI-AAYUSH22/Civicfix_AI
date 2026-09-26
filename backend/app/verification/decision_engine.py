@@ -7,7 +7,9 @@ from app.verification.landmarks import verify_landmarks
 from app.verification.pothole import analyze_pothole_state
 from app.verification.integrity import verify_evidence_integrity
 
-WEIGHTS = {
+import json
+
+DEFAULT_WEIGHTS = {
     "GPS": 0.25,
     "PERSPECTIVE": 0.25,
     "LANDMARK": 0.20,
@@ -15,12 +17,35 @@ WEIGHTS = {
     "INTEGRITY": 0.10,
 }
 
+def get_model_parameters() -> Dict[str, Any]:
+    model_path = os.path.join(os.path.dirname(__file__), "ai_verification_model.json")
+    if os.path.exists(model_path):
+        try:
+            with open(model_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                weights = data.get("feature_weights", DEFAULT_WEIGHTS)
+                # Normalize weights to sum to 1.0 for score calculation
+                w_sum = sum(weights.values()) if sum(weights.values()) > 0 else 1.0
+                norm_weights = {k: v / w_sum for k, v in weights.items()}
+                return {
+                    "weights": norm_weights,
+                    "pass_threshold": data.get("pass_threshold", 72.0),
+                    "model_data": data
+                }
+        except Exception:
+            pass
+    return {"weights": DEFAULT_WEIGHTS, "pass_threshold": 72.0, "model_data": None}
+
 def evaluate_decision(checks: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Evaluates verification checks against deterministic anti-gaming rules.
+    Evaluates verification checks against deterministic anti-gaming rules and trained ML weights.
     Yields VERIFIED_CLOSED (or VERIFIED for backward-compat), FLAGGED_ANOMALY / NOT_VERIFIED,
     or NEEDS_REVIEW for borderline cases.
     """
+    model_params = get_model_parameters()
+    weights = model_params["weights"]
+    pass_threshold = model_params["pass_threshold"]
+
     total_score = 0.0
     check_statuses = {}
     fail_reasons = []
@@ -28,7 +53,7 @@ def evaluate_decision(checks: List[Dict[str, Any]]) -> Dict[str, Any]:
 
     for c in checks:
         ctype = c["check_type"]
-        weight = WEIGHTS.get(ctype, 0.20)
+        weight = weights.get(ctype, 0.20)
         total_score += c["score"] * weight
         status = c["status"]
         check_statuses[ctype] = status
@@ -57,7 +82,7 @@ def evaluate_decision(checks: List[Dict[str, Any]]) -> Dict[str, Any]:
         decision_status = "FLAGGED_ANOMALY"
         summary = "REJECTED & FLAGGED: Visual perspective and background SSIM completely mismatched (unrelated location)."
     # Deterministic Rule 5: Borderline score or single review flag
-    elif len(review_reasons) > 0 or total_score < 72.0:
+    elif len(review_reasons) > 0 or total_score < pass_threshold:
         decision_status = "NEEDS_REVIEW"
         summary = f"Flagged for Sub-Engineer Inspection (Score: {total_score}/100). Details: {'; '.join(review_reasons or fail_reasons)}"
     else:

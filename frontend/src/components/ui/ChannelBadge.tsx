@@ -1,8 +1,8 @@
 import React from 'react';
-import { MessageCircle, Globe, Smartphone, MessageSquare } from 'lucide-react';
+import { MessageCircle, Globe, Smartphone, MessageSquare, Send } from 'lucide-react';
 
 export interface ChannelBadgeProps {
-  channel?: 'APP' | 'WHATSAPP' | 'REDDIT' | 'PORTAL' | string;
+  channel?: 'APP' | 'WHATSAPP' | 'REDDIT' | 'PORTAL' | 'TELEGRAM' | string;
   size?: 'sm' | 'md';
   showLabel?: boolean;
   className?: string;
@@ -22,7 +22,13 @@ export const ChannelBadge: React.FC<ChannelBadgeProps> = ({
   let border = 'border-sky-200';
   let icon = <Globe className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />;
 
-  if (norm === 'WHATSAPP') {
+  if (norm === 'TELEGRAM') {
+    label = 'Telegram';
+    bg = 'bg-sky-50';
+    text = 'text-sky-700';
+    border = 'border-sky-300';
+    icon = <Send className={`${size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} text-sky-600 fill-sky-100`} />;
+  } else if (norm === 'WHATSAPP') {
     label = 'WhatsApp';
     bg = 'bg-emerald-50';
     text = 'text-emerald-700';

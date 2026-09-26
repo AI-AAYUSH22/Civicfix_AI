@@ -19,6 +19,8 @@ class CaseCreate(BaseModel):
     address: Optional[str] = None
     landmark: Optional[str] = None
     title: Optional[str] = None
+    citizen_name: Optional[str] = None
+    citizen_phone: Optional[str] = None
 
 class CaseResponse(BaseModel):
     id: str
@@ -31,6 +33,8 @@ class CaseResponse(BaseModel):
     source_username: Optional[str] = None
     source_url: Optional[str] = None
     citizen_name: Optional[str] = None
+    citizen_phone: Optional[str] = None
+    reported_by: Optional[str] = None
     location_status: Optional[str] = "RESOLVED"
     location_confidence: Optional[float] = 1.0
     ward_id: Optional[str] = None

@@ -27,7 +27,8 @@ def _get_by_identifier(db: Session, identifier: str) -> User | None:
             or_(
                 func.lower(User.email) == cleaned.lower(),
                 func.lower(User.employee_id) == cleaned.lower(),
-                func.lower(User.contractor_id) == cleaned.lower()
+                func.lower(User.contractor_id) == cleaned.lower(),
+                func.lower(User.id) == cleaned.lower()
             )
         )
     )

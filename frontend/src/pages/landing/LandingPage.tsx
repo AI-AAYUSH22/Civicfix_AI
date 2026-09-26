@@ -45,25 +45,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => onSelectSurface('citizen')}
-            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition-colors"
-          >
-            <Smartphone size={14} className="text-teal-400" />
-            <span>Citizen Portal</span>
-          </button>
-          <button
-            onClick={() => onSelectSurface('contractor')}
-            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/80 transition-colors"
-          >
-            <HardHat size={14} className="text-amber-400" />
-            <span>Contractor App</span>
-          </button>
-          <button
             onClick={onGoToLogin}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold transition-all shadow-md shadow-teal-950 hover:shadow-teal-900 group"
           >
-            <Building2 size={15} />
-            <span>Municipal Engineer Login</span>
+            <ShieldCheck size={15} />
+            <span>Sign In / Register</span>
             <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
@@ -95,16 +81,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               onClick={onGoToLogin}
               className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#0F766E] hover:bg-[#115E59] text-white font-bold text-sm transition-all shadow-xl shadow-teal-950/80 flex items-center justify-center gap-2.5 group"
             >
-              <Building2 size={18} />
-              <span>Sign In with Employee ID</span>
+              <ShieldCheck size={18} />
+              <span>Go to Sign In / Register Page</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => onSelectSurface('citizen')}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold text-sm transition-all flex items-center justify-center gap-2"
-            >
-              <Smartphone size={18} className="text-teal-400" />
-              <span>Report Pothole as Citizen</span>
             </button>
           </div>
         </div>

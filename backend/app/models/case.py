@@ -19,6 +19,7 @@ class Case(Base):
     channel = Column(String(50), default="PORTAL", nullable=False)  # PORTAL, WHATSAPP, REDDIT
     source_id = Column(String(255), nullable=True)  # e.g., wa-919876543210 or reddit-t3_abc123
     citizen_name = Column(String(255), nullable=True)  # Display name
+    citizen_phone = Column(String(50), nullable=True, index=True)  # Citizen Mobile Number
     source_username = Column(String(255), nullable=True)  # e.g., u/username or whatsapp name
     source_url = Column(String(500), nullable=True)  # Link to reddit post / comment
     location_status = Column(String(50), default="RESOLVED", nullable=False)  # RESOLVED, PENDING, NEEDS_CLARIFICATION
